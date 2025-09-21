@@ -33,7 +33,7 @@ const Simple3DLoader = ({ onComplete }) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-blue-50 z-50 flex items-center justify-center">
       <div className="text-center">
         {/* 3D Car Animation */}
         <div className="relative mb-8">
@@ -87,7 +87,7 @@ const Simple3DLoader = ({ onComplete }) => {
         <div className="w-64 mx-auto mb-4">
           <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-blue-500 to-green-500 h-full transition-all duration-300 ease-out"
+              className="bg-blue-500 h-full transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             ></div>
           </div>

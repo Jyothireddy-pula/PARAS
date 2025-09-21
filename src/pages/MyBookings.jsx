@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from '../lib/supabase';
 import { Loader } from "../components";
-import { FaClock, FaCar, FaMapMarkerAlt, FaRegCalendarAlt, FaGift, FaCoins, FaTicketAlt, FaPercent } from 'react-icons/fa';
+import { FaClock, FaCar, FaMapMarkerAlt, FaRegCalendarAlt, FaGift, FaCoins, FaTicketAlt, FaPercent, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { motion, AnimatePresence } from "framer-motion";
 import FloatingElements from "../components/ui/FloatingElements";
 import AnimatedCard from "../components/ui/AnimatedCard";
+import BookingCancellationModal from '../components/BookingCancellationModal';
 import AnimatedHeader from "../components/ui/AnimatedHeader";
 import ShimmerButton from "../components/ui/ShimmerButton";
+import { formatIST, formatISTTime, formatISTDate, calculateDurationMinutes, formatDuration } from '../utils/timeUtils';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -17,6 +19,7 @@ const MyBookings = () => {
   const [conversionError, setConversionError] = useState('');
   const [convertedCash, setConvertedCash] = useState(0);
   const [conversionMessage, setConversionMessage] = useState('');
+  const [cancellationModal, setCancellationModal] = useState({ isOpen: false, booking: null });
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -85,18 +88,73 @@ const MyBookings = () => {
     setConversionMessage(`You have converted ${points} points to ₹${cashEquivalent}.`);
   };
 
-  // Calculate duration between start and end time
+  // Calculate duration between start and end time (in minutes for hardware-based)
   const calculateDuration = (start, end) => {
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-    const duration = (endTime - startTime) / (1000 * 60 * 60); // Convert to hours
-    return Math.round(duration * 10) / 10; // Round to 1 decimal place
+    return calculateDurationMinutes(start, end);
   };
 
-  // Calculate total price
+  // Calculate total price (hardware-based per minute)
   const calculatePrice = (start, end, pricePerHour) => {
-    const duration = calculateDuration(start, end);
-    return Math.round(duration * pricePerHour);
+    const durationMinutes = calculateDuration(start, end);
+    const pricePerMinute = pricePerHour / 60;
+    return Math.round(durationMinutes * pricePerMinute);
+  };
+
+  // Calculate real-time price for active bookings
+  const calculateRealTimePrice = (booking) => {
+    if (booking.booking_status !== 'active' || !booking.billing_start_time) {
+      return calculatePrice(booking.start_time, booking.end_time, booking.parking_slots?.it_parks?.price_per_hour);
+    }
+    
+    const durationMinutes = calculateDurationMinutes(booking.billing_start_time, new Date());
+    const pricePerMinute = booking.parking_slots?.it_parks?.price_per_hour / 60;
+    return Math.round(durationMinutes * pricePerMinute);
+  };
+
+  // Handle booking cancellation
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const { error } = await supabase.rpc('cancel_booking', {
+        p_booking_id: bookingId,
+        p_cancellation_reason: 'driver_cancel',
+        p_cancellation_time: new Date().toISOString()
+      });
+
+      if (error) throw error;
+
+      // Refresh bookings list
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          parking_slots (
+            slot_number,
+            basement_number,
+            it_parks (
+              name,
+              address,
+              price_per_hour
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (bookingsError) throw bookingsError;
+      setBookings(bookingsData || []);
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      throw error;
+    }
+  };
+
+  const openCancellationModal = (booking) => {
+    setCancellationModal({ isOpen: true, booking });
+  };
+
+  const closeCancellationModal = () => {
+    setCancellationModal({ isOpen: false, booking: null });
   };
 
   const handleRedeemPoints = (requiredPoints, rewardDescription) => {
@@ -116,7 +174,7 @@ const MyBookings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center relative overflow-hidden">
         <FloatingElements />
         <motion.div 
           className="text-center z-10"
@@ -124,7 +182,7 @@ const MyBookings = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <FaCar className="text-white text-2xl" />
           </div>
           <span className="text-xl font-semibold text-gray-700">
@@ -136,7 +194,7 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+    <div className="min-h-screen bg-blue-50 relative overflow-hidden">
       <FloatingElements />
       
       <div className="container mx-auto px-4 py-8 pt-24 md:pt-8 relative z-10">
@@ -147,7 +205,7 @@ const MyBookings = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <FaCar className="text-white text-3xl" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">My Bookings</h1>
@@ -248,7 +306,7 @@ const MyBookings = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 mb-1">Duration</p>
-                          <p className="text-gray-900 font-medium">{calculateDuration(booking.start_time, booking.end_time)} hours</p>
+                          <p className="text-gray-900 font-medium">{formatDuration(calculateDuration(booking.start_time, booking.end_time))}</p>
                         </div>
                       </div>
 
@@ -259,26 +317,58 @@ const MyBookings = () => {
                         <div>
                           <p className="text-sm text-gray-500 mb-1">Timing</p>
                           <p className="text-gray-900 font-medium text-sm">
-                            {new Date(booking.start_time).toLocaleString()}
+                            {formatIST(booking.start_time)}
                           </p>
                           <p className="text-gray-900 font-medium text-sm">
-                            {new Date(booking.end_time).toLocaleString()}
+                            {formatIST(booking.end_time)}
                           </p>
                         </div>
                       </div>
 
                       {/* Price Section */}
                       <div className="mt-6 pt-4 border-t border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 font-medium">Total Amount</span>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-gray-600 font-medium">
+                            {booking.booking_status === 'active' ? 'Current Amount' : 'Total Amount'}
+                          </span>
                           <span className="text-2xl font-bold text-green-600">
-                            ₹{calculatePrice(
-                              booking.start_time, 
-                              booking.end_time, 
-                              booking.parking_slots?.it_parks?.price_per_hour
-                            )}
+                            ₹{calculateRealTimePrice(booking)}
                           </span>
                         </div>
+                        
+                        {booking.booking_status === 'active' && booking.billing_start_time && (
+                          <div className="text-xs text-gray-500 mb-2">
+                            Billing started: {formatIST(booking.billing_start_time)}
+                            <br />
+                            <span className="text-gray-400">
+                              Duration: {calculateDurationMinutes(booking.billing_start_time, new Date())} minutes
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Cancel Button for Active Bookings */}
+                        {booking.booking_status === 'active' && (
+                          <button
+                            onClick={() => openCancellationModal(booking)}
+                            className="w-full py-2 px-4 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+                          >
+                            <FaTimes />
+                            <span>Cancel Booking</span>
+                          </button>
+                        )}
+                        
+                        {/* Auto-cancel Warning for Active Bookings */}
+                        {booking.booking_status === 'active' && booking.billing_start_time && (
+                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <div className="flex items-center space-x-2">
+                              <FaExclamationTriangle className="text-yellow-600 text-sm" />
+                              <p className="text-xs text-yellow-700">
+                                Booking will auto-cancel after 1 hour if you don't arrive. 
+                                Billing started at {formatISTTime(booking.billing_start_time)}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -299,7 +389,7 @@ const MyBookings = () => {
             <div className="p-8">
               {/* Rewards Header */}
               <div className="flex items-center space-x-4 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
                   <FaGift className="text-white text-xl" />
                 </div>
                 <div>
@@ -309,7 +399,7 @@ const MyBookings = () => {
               </div>
 
               {/* Points Display */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8">
+              <div className="bg-blue-50 rounded-xl p-6 mb-8">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <FaCoins className="text-yellow-500 text-2xl" />
@@ -329,7 +419,7 @@ const MyBookings = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <motion.button
                   onClick={() => handleRedeemPoints(5000, '1 free booking')}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 transition-all duration-300 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative overflow-hidden rounded-xl bg-blue-500 text-white p-6 transition-all duration-300 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={rewardPoints < 5000}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -346,7 +436,7 @@ const MyBookings = () => {
 
                 <motion.button
                   onClick={() => handleRedeemPoints(3000, '50% off')}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white p-6 transition-all duration-300 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative overflow-hidden rounded-xl bg-green-500 text-white p-6 transition-all duration-300 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={rewardPoints < 3000}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -363,7 +453,7 @@ const MyBookings = () => {
 
                 <motion.button
                   onClick={() => handleRedeemPoints(2000, '20% off')}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 transition-all duration-300 hover:from-yellow-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative overflow-hidden rounded-xl bg-yellow-500 text-white p-6 transition-all duration-300 hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={rewardPoints < 2000}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -415,6 +505,14 @@ const MyBookings = () => {
           </AnimatedCard>
         </motion.div>
       </div>
+      
+      {/* Booking Cancellation Modal */}
+      <BookingCancellationModal
+        booking={cancellationModal.booking}
+        isOpen={cancellationModal.isOpen}
+        onClose={closeCancellationModal}
+        onCancel={handleCancelBooking}
+      />
     </div>
   );
 };

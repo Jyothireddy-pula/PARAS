@@ -22,7 +22,7 @@ const NewItemCard = ({
           className={`w-full object-cover ${imageClassName}`}
         />
         <div className="absolute top-3 left-3 bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-          ₹{item.price}/hr
+          ₹{(item.price / 60).toFixed(2)}/min
         </div>
       </figure>
 

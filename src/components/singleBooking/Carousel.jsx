@@ -17,7 +17,7 @@ export default function Carousel({
     <div className="overflow-hidden relative h-40 w-100 lg:w-2/3 rounded-lg mx-auto">
       <div className="absolute top-0 left-0 right-0 p-4 text-gray-100 text-center z-10">
         <p className="font-bold text-lg">{data.name}</p>
-        <p className="font-semibold">Rs {data.price_per_hour}/hr</p>
+        <p className="font-semibold">₹{(data.price_per_hour / 60).toFixed(2)}/min</p>
       </div>
       <div
         className="flex transition-transform ease-out duration-500"

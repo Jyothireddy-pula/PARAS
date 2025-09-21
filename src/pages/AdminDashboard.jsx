@@ -65,7 +65,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+    <div className="min-h-screen bg-blue-50 relative overflow-hidden">
       <FloatingElements />
       
       <div className="flex h-screen relative z-10 pt-16 md:pt-0">
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
           {/* Sidebar Header */}
           <div className="mb-8">
             <div className="flex items-center space-x-3 mb-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <FaChartBar className="text-white text-xl" />
               </div>
               <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
                     onClick={() => setActiveTab(link.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300
                       ${activeTab === link.id 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'hover:bg-gray-100 text-gray-700 hover:shadow-md'
                       }`}
                     whileHover={{ scale: 1.02 }}
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
                     to={link.path}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300
                       ${activeTab === link.id 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'hover:bg-gray-100 text-gray-700 hover:shadow-md'
                       }`}
                   >
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
                     onClick={() => setActiveTab(link.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300
                       ${activeTab === link.id 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'hover:bg-gray-100 text-gray-700 hover:shadow-md'
                       }`}
                     whileHover={{ scale: 1.02 }}
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
               >
                 {/* Dashboard Header */}
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                     <FaChartBar className="text-white text-xl" />
                   </div>
                   <div>
@@ -207,7 +207,7 @@ const AdminDashboard = () => {
                     onClick={() => setActiveDashboardTab('parking-statistics')} 
                     className={`px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-2 ${
                       activeDashboardTab === 'parking-statistics' 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
                     onClick={() => setActiveDashboardTab('slot-management')} 
                     className={`px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-2 ${
                       activeDashboardTab === 'slot-management' 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
                     onClick={() => setActiveDashboardTab('booking-history')} 
                     className={`px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-2 ${
                       activeDashboardTab === 'booking-history' 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -266,7 +266,7 @@ const AdminDashboard = () => {
               >
                 {/* Upload Header */}
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
                     <FaUpload className="text-white text-xl" />
                   </div>
                   <div>
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
                     <AnimatedCard className="h-full">
                       <div className="p-8">
                         <div className="flex items-center space-x-4 mb-6">
-                          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                          <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
                             <FaBuilding className="text-white text-2xl" />
                           </div>
                           <div>
@@ -342,7 +342,7 @@ const AdminDashboard = () => {
                     <AnimatedCard className="h-full">
                       <div className="p-8">
                         <div className="flex items-center space-x-4 mb-6">
-                          <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl flex items-center justify-center">
+                          <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center">
                             <FaHome className="text-white text-2xl" />
                           </div>
                           <div>
@@ -395,7 +395,7 @@ const AdminDashboard = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                     <FaBuilding className="text-white text-xl" />
                   </div>
                   <div>
@@ -419,7 +419,7 @@ const AdminDashboard = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
                     <FaHome className="text-white text-xl" />
                   </div>
                   <div>

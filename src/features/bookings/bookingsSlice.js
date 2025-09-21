@@ -13,8 +13,9 @@ const initialState = {
     date: "",
     basement: "",
     hour: "",
-    duration: "",
-    timeRange: "",
+    startTime: "",
+    bookingType: "hardware_based", // Default to hardware-based
+    // Remove duration and timeRange for hardware-based booking
   },
   selectedSlot: null,
   tempBooking: null,
@@ -46,15 +47,18 @@ const bookingsSlice = createSlice({
       state.singlePark = action.payload;
     },
     setBookingDetails: (state, action) => {
-      const { timeRange } = action.payload;
-      if (timeRange) {
-        try {
-          validateTimeRange(timeRange);
-        } catch (error) {
-          console.error('Invalid time range:', error);
+      const { bookingType, startTime } = action.payload;
+      
+      // For hardware-based booking, validate start time instead of time range
+      if (bookingType === 'hardware_based' && startTime) {
+        const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeRegex.test(startTime)) {
+          console.error('Invalid start time format:', startTime);
+          toast.error('Invalid time format. Please use HH:MM format');
           return;
         }
       }
+      
       state.bookingsDetails = action.payload;
       toast.success("Booking Details Submitted");
     },

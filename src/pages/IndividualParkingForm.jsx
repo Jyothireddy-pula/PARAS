@@ -123,12 +123,12 @@ const IndividualParkingForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-teal-100">
+    <div className="min-h-screen bg-green-50">
       <div className={`${styles.flexCenter} py-8`}>
         <div className="bg-white p-8 rounded-2xl max-w-2xl w-[90%] shadow-xl border border-gray-200">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
@@ -217,12 +217,12 @@ const IndividualParkingForm = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Price per Hour (₹) *
+                  Price per Minute (₹) *
                 </label>
                 <input
                   type="number"
                   name="price_per_hour"
-                  placeholder="Enter price per hour in rupees"
+                  placeholder="Enter price per minute in rupees"
                   value={formData.price_per_hour}
                   onChange={handleChange}
                   required
@@ -292,7 +292,7 @@ const IndividualParkingForm = () => {
               <button
                 type="button"
                 onClick={handleLocationFetch}
-                className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -306,7 +306,7 @@ const IndividualParkingForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-lg transition-all duration-300 font-semibold text-lg flex items-center justify-center gap-2"
+              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-4 px-6 rounded-lg transition-all duration-300 font-semibold text-lg flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

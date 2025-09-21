@@ -13,7 +13,9 @@ const SlotDisplay = ({ data }) => {
   );
 
   // Ensure availableSlots is populated
-  console.log('Available Slots:', availableSlots);
+  console.log('SlotDisplay - Available Slots:', availableSlots);
+  console.log('SlotDisplay - isAvailableSlots:', isAvailableSlots);
+  console.log('SlotDisplay - allSlotsOccupied:', allSlotsOccupied);
 
   return (
     <div className="flex flex-col items-center w-full h-full max-w-lg mx-auto py-2 rounded bg-gray-900">
@@ -64,7 +66,7 @@ const SlotDisplay = ({ data }) => {
                   isSelected={selectedSlot === slot}
                 />
               ))}
-            </div>z
+            </div>
           </div>
 
           <span className="text-white mt-2">Exit</span>
@@ -84,7 +86,7 @@ const SlotDisplay = ({ data }) => {
                 <span className="text-orange-400 font-poppins">
                   Rs
                   {data.price_per_hour && duration
-                    ? data.price_per_hour * duration
+                    ? (data.price_per_hour / 60) * duration
                     : 0}
                 </span>
               </div>

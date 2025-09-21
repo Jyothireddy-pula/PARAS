@@ -19,10 +19,10 @@ export const saveBooking = async (bookingData) => {
       throw new Error('Start time and end time are required');
     }
 
-    // Validate booking time is within next 24 hours
+    // Validate booking time is within next 7 days
     const now = new Date();
     const maxBookingTime = new Date(now);
-    maxBookingTime.setDate(maxBookingTime.getDate() + 1);
+    maxBookingTime.setDate(maxBookingTime.getDate() + 7);
     maxBookingTime.setHours(23, 59, 59, 999);
     
     const requestedStartTime = new Date(bookingData.start_time);
@@ -33,8 +33,19 @@ export const saveBooking = async (bookingData) => {
       throw new Error('Invalid date format provided');
     }
 
-    if (requestedStartTime < now || requestedStartTime > maxBookingTime) {
-      throw new Error('Bookings must be within today or tomorrow (until 23:59)');
+    // For hardware-based bookings, allow booking for current time or slightly in the past
+    // since billing starts immediately. Only check the upper limit (7 days from now)
+    if (requestedStartTime > maxBookingTime) {
+      throw new Error('Bookings must be within the next 7 days');
+    }
+    
+    // For hardware-based bookings, allow booking up to 1 hour in the past
+    // This accounts for users who might book slightly after their intended start time
+    const minBookingTime = new Date(now);
+    minBookingTime.setHours(minBookingTime.getHours() - 1);
+    
+    if (requestedStartTime < minBookingTime) {
+      throw new Error('Cannot book more than 1 hour in the past');
     }
 
     // Check for overlapping bookings

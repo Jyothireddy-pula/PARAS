@@ -233,7 +233,7 @@ const BookingHistory = () => {
       {/* Bookings Table */}
       <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
         <table className="w-full">
-          <thead className="bg-gradient-to-r from-blue-600 to-purple-600">
+          <thead className="bg-blue-600">
             <tr>
               <th className="p-4 text-left text-white font-semibold">Parking Lot</th>
               <th className="p-4 text-left text-white font-semibold">Location</th>

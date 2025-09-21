@@ -5,6 +5,11 @@ import MarkdownIt from 'markdown-it';
 import html2pdf from 'html2pdf.js';
 import { generateCongestionReport } from '../services/gemini';
 import Loader from './loading/Loader';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaChartBar, FaBook, FaDownload, FaFilePdf, FaBars, FaTimes, FaBuilding, FaClock, FaUsers } from 'react-icons/fa';
+import FloatingElements from './ui/FloatingElements';
+import AnimatedCard from './ui/AnimatedCard';
+import ShimmerButton from './ui/ShimmerButton';
 
 import {
   BarChart,
@@ -26,6 +31,7 @@ const GovDashboard = () => {
   const [selectedTab, setSelectedTab] = useState('congestion');
   const [report, setReport] = useState('');
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     loadCongestionData();
@@ -240,132 +246,266 @@ const GovDashboard = () => {
   const renderContent = () => {
     if (selectedTab === 'congestion') {
       return (
-        <div>
-          <h1 className="text-2xl font-bold mb-6">Parking Congestion Dashboard</h1>
-
-          {/* Time Period Filter */}
-          <div className="mb-6">
-            <select
-              value={selectedTimePeriod}
-              onChange={(e) => setSelectedTimePeriod(e.target.value)}
-              className="p-2 border rounded"
-            >
-              <option value="all">All Periods</option>
-              <option value="morning">Morning</option>
-              <option value="afternoon">Afternoon</option>
-              <option value="evening">Evening</option>
-            </select>
-          </div>
-
-          {/* Chart */}
-          <div className="h-[400px] mb-8">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="parking_lot" angle={-45} textAnchor="end" height={100} />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {selectedTimePeriod === 'all' && (
-                  <>
-                    <Bar dataKey="morning" fill="#8884d8" name="Morning" />
-                    <Bar dataKey="afternoon" fill="#82ca9d" name="Afternoon" />
-                    <Bar dataKey="evening" fill="#ffc658" name="Evening" />
-                  </>
-                )}
-                {selectedTimePeriod !== 'all' && (
-                  <Bar 
-                    dataKey={selectedTimePeriod} 
-                    fill="#8884d8" 
-                    name={selectedTimePeriod.charAt(0).toUpperCase() + selectedTimePeriod.slice(1)} 
-                  />
-                )}
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Data Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border">
-              <thead>
-                <tr>
-                  <th className="border p-2">Parking Lot</th>
-                  <th className="border p-2">Time Period</th>
-                  <th className="border p-2">Congestion Level</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                    <td className="border p-2">{item.parking_lot}</td>
-                    <td className="border p-2">{item.time_period || 'Overall'}</td>
-                    <td className="border p-2">
-                      <div className="flex items-center">
-                        <div 
-                          className="h-4 rounded"
-                          style={{
-                            width: `${item.congestion_level}%`,
-                            backgroundColor: `rgb(${255 * item.congestion_level / 100}, ${255 * (1 - item.congestion_level / 100)}, 0)`
-                          }}
-                        />
-                        <span className="ml-2">{item.congestion_level}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Updated Report Section */}
-          <div className="mt-8 space-y-4">
-            {/* Generate Report Button */}
+        <div className="space-y-6">
+          {/* Header */}
+          <motion.div 
+            className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <div>
-              <button
-                onClick={() => generateReport()}
-                disabled={isGeneratingReport}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 mr-4"
-              >
-                {isGeneratingReport ? 'Generating Report...' : 'Generate AI Analysis Report'}
-              </button>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Parking Congestion Dashboard</h1>
+              <p className="text-gray-600">Monitor and analyze parking congestion patterns across the city</p>
             </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <FaClock className="text-blue-500" />
+              <span>Last updated: {new Date().toLocaleString()}</span>
+            </div>
+          </motion.div>
 
-            {/* Report Display and Download Section */}
-            {report && typeof report === 'string' && (
-              <div>
-                <button
-                  onClick={downloadReport}
-                  disabled={isGeneratingReport}
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400 flex items-center gap-2"
-                >
-                  {isGeneratingReport ? (
-                    <>
-                      <span className="animate-spin">↻</span>
-                      Generating PDF...
-                    </>
-                  ) : (
-                    'Download Report as PDF'
-                  )}
-                </button>
-                
-                {/* Preview section */}
-                <div className="mt-4 p-4 border rounded">
-                  <h2 className="text-xl font-bold mb-4">AI Generated Analysis Report</h2>
-                  <div 
-                    className="prose max-w-none" 
-                    dangerouslySetInnerHTML={{ __html: md.render(report) }}
-                  />
+          {/* Stats Cards */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <AnimatedCard>
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm">Total Parking Lots</p>
+                    <p className="text-2xl font-bold text-gray-900">{chartData.length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <FaBuilding className="text-blue-600 text-xl" />
+                  </div>
                 </div>
               </div>
-            )}
+            </AnimatedCard>
 
-            {/* Error Display */}
-            {error && (
-              <div className="text-red-500 mt-4">
-                {error}
+            <AnimatedCard>
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm">Avg Congestion</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {filteredData.length > 0 
+                        ? Math.round(filteredData.reduce((acc, item) => acc + item.congestion_level, 0) / filteredData.length)
+                        : 0}%
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <FaChartBar className="text-green-600 text-xl" />
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            </AnimatedCard>
+
+            <AnimatedCard>
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm">Data Points</p>
+                    <p className="text-2xl font-bold text-gray-900">{filteredData.length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <FaUsers className="text-purple-600 text-xl" />
+                  </div>
+                </div>
+              </div>
+            </AnimatedCard>
+          </motion.div>
+
+          {/* Time Period Filter */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <AnimatedCard>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Time Period</h3>
+                <div className="flex flex-wrap gap-3">
+                  {['all', 'morning', 'afternoon', 'evening'].map((period) => (
+                    <button
+                      key={period}
+                      onClick={() => setSelectedTimePeriod(period)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                        selectedTimePeriod === period
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {period.charAt(0).toUpperCase() + period.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+          </motion.div>
+
+          {/* Chart */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <AnimatedCard>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Congestion Analysis Chart</h3>
+                <div className="h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis 
+                        dataKey="parking_lot" 
+                        angle={-45} 
+                        textAnchor="end" 
+                        height={100}
+                        fontSize={12}
+                        stroke="#6b7280"
+                      />
+                      <YAxis 
+                        domain={[0, 100]} 
+                        fontSize={12}
+                        stroke="#6b7280"
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                      />
+                      <Legend />
+                      {selectedTimePeriod === 'all' && (
+                        <>
+                          <Bar dataKey="morning" fill="#3b82f6" name="Morning" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="afternoon" fill="#10b981" name="Afternoon" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="evening" fill="#f59e0b" name="Evening" radius={[4, 4, 0, 0]} />
+                        </>
+                      )}
+                      {selectedTimePeriod !== 'all' && (
+                        <Bar 
+                          dataKey={selectedTimePeriod} 
+                          fill="#3b82f6" 
+                          name={selectedTimePeriod.charAt(0).toUpperCase() + selectedTimePeriod.slice(1)}
+                          radius={[4, 4, 0, 0]}
+                        />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </AnimatedCard>
+          </motion.div>
+
+          {/* Data Table */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <AnimatedCard>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Data</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-blue-600 text-white">
+                        <th className="p-4 text-left font-semibold">Parking Lot</th>
+                        <th className="p-4 text-left font-semibold">Time Period</th>
+                        <th className="p-4 text-left font-semibold">Congestion Level</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filteredData.map((item, index) => (
+                        <tr key={index} className={`transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                          <td className="p-4 font-medium text-gray-900">{item.parking_lot}</td>
+                          <td className="p-4 text-gray-700">{item.time_period || 'Overall'}</td>
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full transition-all duration-300 ${
+                                    item.congestion_level > 80 ? 'bg-red-500' :
+                                    item.congestion_level > 60 ? 'bg-yellow-500' : 'bg-green-500'
+                                  }`}
+                                  style={{ width: `${item.congestion_level}%` }}
+                                />
+                              </div>
+                              <span className="text-sm font-medium text-gray-900 min-w-[3rem]">
+                                {item.congestion_level}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </AnimatedCard>
+          </motion.div>
+
+          {/* Report Section */}
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            <AnimatedCard>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis Report</h3>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <ShimmerButton
+                    onClick={() => generateReport()}
+                    disabled={isGeneratingReport}
+                    className="flex items-center gap-2"
+                  >
+                    <FaBook />
+                    {isGeneratingReport ? 'Generating Report...' : 'Generate AI Analysis Report'}
+                  </ShimmerButton>
+
+                  {report && typeof report === 'string' && (
+                    <ShimmerButton
+                      onClick={downloadReport}
+                      disabled={isGeneratingReport}
+                      className="flex items-center gap-2 bg-green-600"
+                    >
+                      <FaDownload />
+                      {isGeneratingReport ? 'Generating PDF...' : 'Download PDF Report'}
+                    </ShimmerButton>
+                  )}
+                </div>
+
+                {/* Report Preview */}
+                {report && typeof report === 'string' && (
+                  <div className="mt-6 p-6 bg-gray-50 rounded-xl border">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <FaFilePdf className="text-red-500" />
+                      AI Generated Analysis Report
+                    </h4>
+                    <div 
+                      className="prose max-w-none text-gray-700" 
+                      dangerouslySetInnerHTML={{ __html: md.render(report) }}
+                    />
+                  </div>
+                )}
+
+                {/* Error Display */}
+                {error && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 font-medium">Error: {error}</p>
+                  </div>
+                )}
+              </div>
+            </AnimatedCard>
+          </motion.div>
         </div>
       );
     } else if (selectedTab === 'bookings') {
@@ -374,27 +514,111 @@ const GovDashboard = () => {
   };
 
   if (loading) return <Loader show3D={true} />;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (error) return (
+    <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-red-500 text-xl font-semibold mb-2">Error</div>
+        <div className="text-gray-600">{error}</div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex">
-      <nav className="w-64 bg-gray-800 text-white p-4">
-        <h2 className="text-lg font-bold mb-4">Dashboard</h2>
-        <ul>
-          <li className="mb-2">
-            <button onClick={() => setSelectedTab('congestion')} className="w-full text-left p-2 hover:bg-gray-700">
-              Congestion Dashboard
-            </button>
-          </li>
-          <li>
-            <button onClick={() => setSelectedTab('bookings')} className="w-full text-left p-2 hover:bg-gray-700">
-              Bookings Dashboard
-            </button>
-          </li>
-        </ul>
-      </nav>
-      <div className="flex-1 p-6">
-        {renderContent()}
+    <div className="min-h-screen bg-blue-50 relative overflow-hidden">
+      <FloatingElements />
+      
+      <div className="flex h-screen relative z-10">
+        {/* Menu Button - Mobile and Desktop */}
+        <motion.button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="fixed top-20 left-4 z-30 bg-white/90 backdrop-blur-md p-3 rounded-xl text-gray-700 shadow-lg border border-white/20"
+          whileTap={{ scale: 0.95 }}
+        >
+          {isMobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        </motion.button>
+
+        {/* Sidebar */}
+        <motion.div 
+          className={`
+            fixed
+            w-72 bg-white/90 backdrop-blur-md text-gray-800 p-6 flex-shrink-0
+            h-full z-20 shadow-xl border-r border-white/20
+            ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+          `}
+          initial={{ x: -300 }}
+          animate={{ x: isMobileMenuOpen ? 0 : -300 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Sidebar Header */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <FaChartBar className="text-white text-xl" />
+              </div>
+              <h1 className="text-xl font-bold text-gray-900">Government Dashboard</h1>
+            </div>
+            <p className="text-gray-600 text-sm">Smart Parking Analytics</p>
+          </div>
+
+          <div className="space-y-3">
+            <motion.button
+              onClick={() => {
+                setSelectedTab('congestion');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                selectedTab === 'congestion' 
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'text-gray-700'
+              }`}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaChartBar className="text-lg" />
+              <span className="font-medium">Congestion Dashboard</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => {
+                setSelectedTab('bookings');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                selectedTab === 'bookings' 
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'text-gray-700'
+              }`}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaBook className="text-lg" />
+              <span className="font-medium">Bookings Dashboard</span>
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Overlay for all screen sizes */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10"
+              onClick={() => setIsMobileMenuOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <div className="flex-1 p-4 lg:p-6 overflow-auto w-full">
+          <motion.div 
+            className="bg-white/80 backdrop-blur-md p-6 lg:p-8 rounded-2xl w-full shadow-xl border border-white/20 min-h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {renderContent()}
+          </motion.div>
+        </div>
       </div>
     </div>
   );

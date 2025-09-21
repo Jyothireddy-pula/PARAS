@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import FloatingElements from "../components/ui/FloatingElements";
 import AnimatedCard from "../components/ui/AnimatedCard";
 import ShimmerButton from "../components/ui/ShimmerButton";
-import { FaCheckCircle, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaCreditCard, FaUser } from "react-icons/fa";
+import { FaCheckCircle, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaCreditCard, FaUser, FaCar } from "react-icons/fa";
 
 const Confirmation = () => {
   const dispatch = useDispatch();
@@ -79,16 +79,16 @@ const Confirmation = () => {
         throw new Error('No authenticated user found');
       }
 
-      // Parse the time range
-      if (!bookingsDetails.timeRange) {
-        throw new Error('Time range is required');
+      // For hardware-based booking, we only need start time
+      if (!bookingsDetails.startTime) {
+        throw new Error('Start time is required');
       }
 
-      const [startTime, endTime] = bookingsDetails.timeRange.split('-').map(t => t.trim());
+      const startTime = bookingsDetails.startTime;
       
-      // Validate time format (24-hour format)
+      // Validate time format (24-hour format with minutes)
       const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
-      if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+      if (!timeRegex.test(startTime)) {
         throw new Error('Invalid time format. Please use HH:MM format (24-hour)');
       }
 
@@ -101,43 +101,41 @@ const Confirmation = () => {
         throw new Error('Invalid date format');
       }
 
-      // Create timestamps for start and end times
+      // Create timestamp for start time (with minutes)
       const [startHours, startMinutes] = startTime.split(':').map(Number);
-      const [endHours, endMinutes] = endTime.split(':').map(Number);
 
-      // Create date objects with the correct time
+      // Create date object with the correct time
       const startDateTime = new Date(bookingDate);
-      const endDateTime = new Date(bookingDate);
-
-      // Set hours directly without UTC conversion
       startDateTime.setHours(startHours, startMinutes, 0, 0);
-      endDateTime.setHours(endHours, endMinutes, 0, 0);
+
+      // For hardware-based booking, end time will be determined by hardware
+      // Set a placeholder end time (24 hours later) - will be updated by hardware
+      const endDateTime = new Date(startDateTime);
+      endDateTime.setHours(startDateTime.getHours() + 24);
 
       // Debug log
-      console.log('Time components:', {
+      console.log('Hardware-based booking components:', {
         bookingDate: bookingDate.toISOString(),
         requestedTime: {
-          start: `${startHours}:${startMinutes}`,
-          end: `${endHours}:${endMinutes}`
+          start: startTime
         },
         actualTime: {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString(),
-          startHours: startDateTime.getHours(),
-          endHours: endDateTime.getHours()
+          startHours: startDateTime.getHours()
         }
       });
-
-      // Validate that end time is after start time
-      if (endDateTime <= startDateTime) {
-        throw new Error('End time must be after start time');
-      }
 
       const bookingData = {
         slot_id: selectedSlot.id,
         start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(),
+        end_time: endDateTime.toISOString(), // Placeholder - will be updated by hardware
         vehicle_number: formData.vehicleNumber,
+        booking_type: 'hardware_based',
+        hardware_entry_detected: false,
+        hardware_exit_detected: false,
+        billing_started: true, // Start billing immediately
+        billing_start_time: new Date().toISOString(), // Current time when booking is made
       };
 
       // Debug log to verify the data
@@ -176,7 +174,7 @@ const Confirmation = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center relative overflow-hidden">
         <FloatingElements />
         <motion.div 
           className="text-center z-10"
@@ -184,7 +182,7 @@ const Confirmation = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <FaCheckCircle className="text-white text-2xl" />
           </div>
           <span className="text-xl font-semibold text-gray-700">
@@ -196,7 +194,7 @@ const Confirmation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+    <div className="min-h-screen bg-blue-50 relative overflow-hidden">
       <FloatingElements />
       
       {/* Header */}
@@ -222,7 +220,7 @@ const Confirmation = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+              className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
             >
               <FaCheckCircle className="text-white text-3xl" />
             </motion.div>
@@ -242,7 +240,7 @@ const Confirmation = () => {
               <AnimatedCard className="h-full">
                 <div className="p-6">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                       <FaUser className="text-white" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900">Your Details</h3>
@@ -317,7 +315,7 @@ const Confirmation = () => {
               <AnimatedCard className="h-full">
                 <div className="p-6">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                       <FaCreditCard className="text-white" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900">Booking Summary</h3>
@@ -346,38 +344,42 @@ const Confirmation = () => {
                       <div className="flex items-start space-x-3">
                         <FaClock className="text-purple-500 mt-1" />
                         <div>
-                          <p className="text-gray-600 text-sm">Time</p>
-                          <p className="text-gray-900 font-semibold">{bookingsDetails.timeRange}</p>
+                          <p className="text-gray-600 text-sm">Expected Arrival</p>
+                          <p className="text-gray-900 font-semibold">{bookingsDetails.startTime}</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Duration */}
+                    {/* Hardware-based booking info */}
                     <div className="flex items-start space-x-3">
-                      <FaClock className="text-orange-500 mt-1" />
+                      <FaCar className="text-blue-500 mt-1" />
                       <div>
-                        <p className="text-gray-600 text-sm">Duration</p>
-                        <p className="text-gray-900 font-semibold">{bookingsDetails.duration} hour(s)</p>
+                        <p className="text-gray-600 text-sm">Billing Method</p>
+                        <p className="text-gray-900 font-semibold">Pay per minute (Hardware detected)</p>
+                        <p className="text-gray-500 text-xs">Billing starts when you arrive</p>
                       </div>
                     </div>
 
                     {/* Price Breakdown */}
                     <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Rate per hour</span>
-                        <span className="text-gray-900 font-medium">₹{singlePark.price_per_hour}</span>
+                        <span className="text-gray-600">Rate per minute</span>
+                        <span className="text-gray-900 font-medium">₹{(singlePark.price_per_hour / 60).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Duration</span>
-                        <span className="text-gray-900 font-medium">{bookingsDetails.duration} hours</span>
+                        <span className="text-gray-600">Billing Method</span>
+                        <span className="text-gray-900 font-medium">Hardware detected</span>
                       </div>
                       <div className="border-t border-gray-200 pt-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-semibold text-gray-900">Total Amount</span>
-                          <span className="text-2xl font-bold text-green-600">
-                            ₹{singlePark.price_per_hour * bookingsDetails.duration}
+                          <span className="text-lg font-semibold text-gray-900">Billing Method</span>
+                          <span className="text-2xl font-bold text-blue-600">
+                            Auto-billing from booking
                           </span>
                         </div>
+                        <p className="text-gray-500 text-sm mt-2">
+                          Billing starts immediately when you confirm and continues until you leave or cancel
+                        </p>
                       </div>
                     </div>
 

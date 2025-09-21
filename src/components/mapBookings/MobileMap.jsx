@@ -397,7 +397,7 @@ const MobileMap = () => {
                   className="w-full h-32 object-cover rounded-t-lg"
                 />
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-900 px-2 py-1 rounded-full text-xs font-semibold shadow-lg max-w-[80px] truncate">
-                  ₹{selectedPark.price_per_hour}/hr
+                  ₹{(selectedPark.price_per_hour / 60).toFixed(2)}/min
                 </div>
                 <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                   Available

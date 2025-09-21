@@ -93,7 +93,7 @@ const SlotManagement = () => {
       {Object.entries(parkingData).map(([parkId, parkInfo]) => (
         <div key={parkId} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+          <div className="bg-blue-600 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-white text-2xl font-bold mb-2">

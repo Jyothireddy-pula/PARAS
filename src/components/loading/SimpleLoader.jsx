@@ -4,7 +4,7 @@ import { FaCar, FaParking } from 'react-icons/fa';
 const SimpleLoader = ({ onComplete }) => {
   return (
     <motion.div 
-      className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-blue-50 z-50 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -18,7 +18,7 @@ const SimpleLoader = ({ onComplete }) => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 mx-auto bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
             <FaParking className="text-white text-3xl" />
           </div>
         </motion.div>
@@ -63,7 +63,7 @@ const SimpleLoader = ({ onComplete }) => {
             }}
           />
           <motion.div
-            className="w-3 h-3 bg-purple-600 rounded-full"
+            className="w-3 h-3 bg-blue-600 rounded-full"
             animate={{ 
               scale: [1, 1.2, 1],
               opacity: [0.5, 1, 0.5]

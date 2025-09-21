@@ -43,7 +43,7 @@ const MobileNavbar = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <FaMapMarkerAlt className="text-white text-sm" />
             </div>
             <span className="text-lg font-bold text-gray-800">PARAS</span>
@@ -96,7 +96,7 @@ const MobileNavbar = () => {
                   className="flex items-center space-x-3 hover:opacity-80 transition-opacity w-full text-left"
                   whileTap={{ scale: 0.95 }}
                 >
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                     <FaMapMarkerAlt className="text-white text-lg" />
                   </div>
                   <div>
@@ -121,7 +121,7 @@ const MobileNavbar = () => {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     whileHover={{ x: 4 }}
                   >
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                       <span className="text-blue-600 text-lg font-bold">
                         {nav.title.charAt(0)}
                       </span>
@@ -173,7 +173,7 @@ const MobileNavbar = () => {
                         navigate('/register');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl transition-colors"
+                      className="w-full flex items-center justify-center space-x-2 p-3 bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors"
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ duration: 0.3, delay: 0.5 }}

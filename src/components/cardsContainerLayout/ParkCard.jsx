@@ -49,7 +49,7 @@ const ParkCard = ({
           
           {/* Gradient overlay */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
+            className="absolute inset-0 bg-black/20"
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
             transition={{ duration: 0.3 }}
@@ -60,7 +60,7 @@ const ParkCard = ({
             className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-sm font-semibold shadow-lg"
             whileHover={{ scale: 1.05 }}
           >
-            ₹{park.price_per_hour}/hr
+            ₹{(park.price_per_hour / 60).toFixed(2)}/min
           </motion.div>
 
           {/* Availability indicator */}
@@ -75,7 +75,7 @@ const ParkCard = ({
 
           {showButton && (
             <motion.button 
-              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium shadow-lg z-10"
+              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-6 py-2 rounded-full font-medium shadow-lg z-10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 20 }}

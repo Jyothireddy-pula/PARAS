@@ -17,17 +17,23 @@ export const updateSlotStatus = async (slotId, status) => {
   }
 };
 
-export const getSlotAvailability = async (parkId, basement, date, timeRange) => {
+export const getSlotAvailability = async (parkId, basement = null, date = null, timeRange = null) => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('parking_slots')
       .select('*')
-      .eq('park_id', parkId)
-      .eq('status', 'Available')
-      .eq('basement_number', basement);
+      .eq('park_id', parkId);
+
+    // Only filter by basement if provided
+    if (basement !== null) {
+      query = query.eq('basement_number', basement);
+    }
+
+    // Don't filter by status - we want all slots to check availability
+    const { data, error } = await query;
 
     if (error) throw error;
-    return data;
+    return data || [];
   } catch (error) {
     console.error('Error getting slot availability:', error);
     throw error;

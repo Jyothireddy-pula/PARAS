@@ -138,7 +138,7 @@ const ListBookings = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      <div className="min-h-screen bg-blue-50 relative overflow-hidden">
         <FloatingElements />
         
         {/* Header Section */}
@@ -156,7 +156,7 @@ const ListBookings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                   <FaMapMarkerAlt className="text-white text-xl" />
                 </div>
                 <div>
@@ -192,7 +192,7 @@ const ListBookings = () => {
           <AnimatedCard className="max-w-2xl mx-auto">
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                   <FaSearch className="text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Search Location</h3>

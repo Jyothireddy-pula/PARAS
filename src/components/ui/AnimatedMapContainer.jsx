@@ -1,32 +1,20 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 const AnimatedMapContainer = ({ children, className = "" }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <motion.div
       className={`relative overflow-hidden rounded-2xl ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.8 }}
-      whileHover={{ scale: 1.02 }}
     >
-      {/* Animated border gradient */}
-      <motion.div
+      {/* Static border gradient */}
+      <div
         className="absolute inset-0 rounded-2xl"
         style={{
           background: "linear-gradient(45deg, #3B82F6, #8B5CF6, #06B6D4, #10B981)",
           padding: "2px",
         }}
-        animate={{
-          background: isHovered 
-            ? "linear-gradient(45deg, #3B82F6, #8B5CF6, #06B6D4, #10B981, #F59E0B)"
-            : "linear-gradient(45deg, #3B82F6, #8B5CF6, #06B6D4, #10B981)",
-        }}
-        transition={{ duration: 0.5 }}
       />
       
       {/* Inner content */}

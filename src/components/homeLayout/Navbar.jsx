@@ -39,7 +39,7 @@ const Navbar = () => {
       
       {/* Desktop Navbar */}
       <motion.nav 
-        className="w-full hidden md:flex py-4 justify-between items-center shadow-lg bg-gradient-to-r from-slate-800 to-slate-900 backdrop-blur-sm"
+        className="w-full hidden md:flex py-4 justify-between items-center shadow-lg bg-slate-800 backdrop-blur-sm"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
