@@ -56,7 +56,6 @@ PARAS/
     ├── 📄 main.jsx                    # Application entry point
     ├── 📄 App.jsx                     # Main app component with routing
     ├── 📄 store.js                    # Redux store configuration
-    ├── 📄 server.js                   # Mock server setup
     ├── 📄 MapProvider.jsx             # Google Maps context provider
     ├── 📄 index.css                   # Global styles
     ├── 📄 style.js                    # Style utilities
@@ -124,7 +123,6 @@ PARAS/
     │   ├── GovDashboard.jsx           # Government analytics dashboard
     │   ├── ParkingStatistics.jsx     # Parking statistics display
     │   ├── SlotManagement.jsx        # Slot management interface
-    │   ├── ChatWidget.jsx             # Chat functionality
     │   ├── Map.jsx                    # Basic map component
     │   ├── Map2.jsx                   # Enhanced map component
     │   │
@@ -190,14 +188,6 @@ PARAS/
     │       ├── GlareCard.jsx          # Glare effect card
     │       └── ShimmerButton.jsx      # Shimmer effect button
     │
-    ├── 📁 mocks/                      # Mock data and server
-    │   └── server.js                  # Mock server setup
-    │
-    ├── 📁 backend/                    # Backend utilities
-    │   ├── controllers/
-    │   │   └── AuthController.js      # Authentication controller
-    │   └── utils/
-    │       └── authUtils.js           # Authentication utilities
     │
     └── 📁 assets/                     # Static assets
         ├── index.js                   # Asset exports

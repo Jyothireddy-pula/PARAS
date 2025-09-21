@@ -1,4 +1,5 @@
 export { default as Navbar } from "./homeLayout/Navbar";
+export { default as MobileNavbar } from "./homeLayout/MobileNavbar";
 export { default as Hero } from "./landing/Hero";
 export { default as Header } from "./homeLayout/Header";
 export { default as GetStarted } from "./landing/GetStarted";

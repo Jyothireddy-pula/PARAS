@@ -31,7 +31,7 @@ const MapBookings = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen pt-16 md:pt-0">
       <Map />
     </div>
   );

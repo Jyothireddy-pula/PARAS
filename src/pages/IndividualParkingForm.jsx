@@ -123,135 +123,208 @@ const IndividualParkingForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-teal-100">
       <div className={`${styles.flexCenter} py-8`}>
-        <div className="bg-[#2C3E50] p-6 rounded-lg max-w-2xl w-[90%] shadow-lg">
-          <h2 className="text-2xl text-center text-white mb-6 font-bold">
-            List Individual Parking
-          </h2>
+        <div className="bg-white p-8 rounded-2xl max-w-2xl w-[90%] shadow-xl border border-gray-200">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              List Individual Parking
+            </h2>
+            <p className="text-gray-600">
+              Add your personal parking space to our platform
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <InputField
-              label="Parking Name"
-              type="text"
-              name="name"
-              placeholder="Enter your parking space name"
-              value={formData.name}
-              onChange={handleChange}
-              error={errors.name}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-            />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Parking Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your parking space name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
 
-            <InputField
-              label="Address"
-              type="text"
-              name="address"
-              placeholder="Enter your complete address"
-              value={formData.address}
-              onChange={handleChange}
-              error={errors.address}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-            />
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  City *
+                </label>
+                <select
+                  name="city_id"
+                  value={formData.city_id}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                >
+                  <option value="">Select your city</option>
+                  {cities.map(city => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}, {city.state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <div>
-              <label className="block text-gray-300 mb-2">City</label>
-              <select
-                name="city_id"
-                value={formData.city_id}
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Complete Address *
+              </label>
+              <textarea
+                name="address"
+                placeholder="Enter your complete address"
+                value={formData.address}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white border border-gray-600 placeholder-gray-400"
-              >
-                <option value="">Select your city</option>
-                {cities.map(city => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}, {city.state}
-                  </option>
-                ))}
-              </select>
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200 resize-none"
+              />
+              {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
             </div>
 
-            <InputField
-              label="Number of Slots"
-              type="number"
-              name="number_of_slots"
-              placeholder="Enter number of available parking slots"
-              value={formData.number_of_slots}
-              onChange={handleChange}
-              error={errors.number_of_slots}
-              required
-              min="1"
-              className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-            />
-
-            <InputField
-              label="Price per Hour (₹)"
-              type="number"
-              name="price_per_hour"
-              placeholder="Enter price per hour in rupees"
-              value={formData.price_per_hour}
-              onChange={handleChange}
-              error={errors.price_per_hour}
-              required
-              min="0"
-              className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-            />
-
-            <InputField
-              label="Contact Number"
-              type="tel"
-              name="contact_number"
-              placeholder="Enter your 10-digit contact number"
-              value={formData.contact_number}
-              onChange={handleChange}
-              error={errors.contact_number}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-            />
-
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <InputField
-                  label="Latitude"
-                  type="text"
-                  name="latitude"
-                  value={formData.latitude}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Number of Slots *
+                </label>
+                <input
+                  type="number"
+                  name="number_of_slots"
+                  placeholder="Enter number of available parking slots"
+                  value={formData.number_of_slots}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-                  readOnly
+                  required
+                  min="1"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
                 />
+                {errors.number_of_slots && <p className="text-red-500 text-sm mt-1">{errors.number_of_slots}</p>}
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Price per Hour (₹) *
+                </label>
+                <input
+                  type="number"
+                  name="price_per_hour"
+                  placeholder="Enter price per hour in rupees"
+                  value={formData.price_per_hour}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                />
+                {errors.price_per_hour && <p className="text-red-500 text-sm mt-1">{errors.price_per_hour}</p>}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Contact Number *
+              </label>
+              <input
+                type="tel"
+                name="contact_number"
+                placeholder="Enter your 10-digit contact number"
+                value={formData.contact_number}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+              />
+              {errors.contact_number && <p className="text-red-500 text-sm mt-1">{errors.contact_number}</p>}
+            </div>
+
+            {/* Location Section */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Location Information
+              </h3>
               
-              <div className="flex-1">
-                <InputField
-                  label="Longitude"
-                  type="text"
-                  name="longitude"
-                  value={formData.longitude}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#34495E] text-white placeholder-gray-400"
-                  readOnly
-                />
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Latitude
+                  </label>
+                  <input
+                    type="text"
+                    name="latitude"
+                    value={formData.latitude}
+                    onChange={handleChange}
+                    readOnly
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Longitude
+                  </label>
+                  <input
+                    type="text"
+                    name="longitude"
+                    value={formData.longitude}
+                    onChange={handleChange}
+                    readOnly
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600"
+                  />
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={handleLocationFetch}
+                className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Get Current Location
+              </button>
             </div>
 
-            <Button
-              type="button"
-              onClick={handleLocationFetch}
-              className="w-full bg-[#3498DB] hover:bg-[#2980B9] text-white py-2 px-4 rounded-lg transition-colors duration-300"
-            >
-              Get Current Location
-            </Button>
-
-            <Button
+            {/* Submit Button */}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#007BFF] hover:bg-[#0056D2] text-white py-2 rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-lg transition-all duration-300 font-semibold text-lg flex items-center justify-center gap-2"
             >
-              {loading ? 'Adding...' : 'Submit Listing'}
-            </Button>
+              {loading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding Parking Space...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Submit Listing
+                </>
+              )}
+            </button>
           </form>
         </div>
       </div>

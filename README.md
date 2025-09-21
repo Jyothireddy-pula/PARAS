@@ -63,6 +63,11 @@ cd PARAS
 npm install --legacy-peer-deps
 ```
 
+**Or use the provided script:**
+```bash
+npm run install:legacy
+```
+
 **Alternative with yarn:**
 ```bash
 yarn install
@@ -207,6 +212,8 @@ VITE_GEMINI_API_KEY=your_google_gemini_api_key
 ```bash
 # If you encounter peer dependency issues
 npm install --legacy-peer-deps
+# Or use the provided script
+npm run install:legacy
 ```
 
 **2. Google Maps Not Loading**
@@ -224,6 +231,8 @@ npm install --legacy-peer-deps
 # Clear node_modules and reinstall
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps
+# Or use the provided script
+npm run install:legacy
 ```
 
 ## 📱 Mobile Optimization

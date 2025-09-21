@@ -16,7 +16,12 @@ import { setUserLocation } from "../features/bookings/bookingsSlice"; // Redux a
 import styles from "../style";
 import { toast } from "react-toastify";
 import { useLocation } from 'react-router-dom'; // Add this if not already present
-import { FaMapMarkerAlt } from 'react-icons/fa'; // Import the icon
+import { FaMapMarkerAlt, FaSearch, FaFilter } from 'react-icons/fa'; // Import the icons
+import { motion, AnimatePresence } from "framer-motion";
+import FloatingElements from "../components/ui/FloatingElements";
+import ShimmerButton from "../components/ui/ShimmerButton";
+import AnimatedCard from "../components/ui/AnimatedCard";
+import AnimatedHeader from "../components/ui/AnimatedHeader";
 
 // Add this function at the top of your file, outside the component
 const normalizeCity = (cityName) => {
@@ -133,29 +138,114 @@ const ListBookings = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full">
-        <div className="flex justify-between items-center p-4">
-          <div className="flex items-center">
-            <FaMapMarkerAlt className="text-blue-500 mr-2" /> {/* Icon for the city */}
-            <span className="text-lg font-bold">{userCity || 'Select a city'}</span> {/* City name */}
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+        <FloatingElements />
         
-        <div className="mx-auto w-full lg:w-1/3">
-          <Places setUserLocation={handleLocationSelect} />
-          {/* Display an error message if no parks are found in the selected city */}
-          {!hasParksInCity && userCity && (
-            <p className={`error-message mt-2 ${styles.flexCenter}`}>
-              No services in this area
-            </p>
-          )}
-        </div>
-        <div className="flex-1">
+        {/* Header Section */}
+        <motion.div 
+          className="relative z-10 bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20 pt-16 md:pt-0"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <motion.div 
+                className="flex items-center space-x-3"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <FaMapMarkerAlt className="text-white text-xl" />
+                </div>
+                <div>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {userCity || 'Select a city'}
+                  </span>
+                  <p className="text-sm text-gray-600">Find parking spots near you</p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-center space-x-2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                <span className="text-sm text-gray-600">Live availability</span>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* Search Section */}
+        <motion.div 
+          className="relative z-10 container mx-auto px-4 py-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <AnimatedCard className="max-w-2xl mx-auto">
+            <div className="p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <FaSearch className="text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Search Location</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <Places 
+                  setUserLocation={handleLocationSelect}
+                  customClass="w-full p-4 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 shadow-sm"
+                />
+                
+                <AnimatePresence>
+                  {!hasParksInCity && userCity && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="bg-red-50 border border-red-200 rounded-lg p-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">!</span>
+                        </div>
+                        <p className="text-red-700 font-medium">No parking services available in this area</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </AnimatedCard>
+        </motion.div>
+        
+        {/* Parks Grid Section */}
+        <motion.div 
+          className="relative z-10 container mx-auto px-4 pb-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <div className="mb-6">
+            <AnimatedHeader 
+              title="Available Parking Spots"
+              subtitle="Choose from the best parking locations in your area"
+              className="text-center"
+            />
+          </div>
+          
           <ParksGrid 
             userCity={normalizeCity(userCity)} 
             key={userCity} // Add this to force re-render when city changes
           />
-        </div>
+        </motion.div>
       </div>
     </>
   );

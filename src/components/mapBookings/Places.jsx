@@ -5,7 +5,7 @@ import usePlacesAutocomplete, {
 } from "use-places-autocomplete";
 import { InputField } from "../index";
 
-export default function Places({ setUserLocation }) {
+export default function Places({ setUserLocation, customClass = "" }) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 
   const [focussedIndex, setFocussedIndex] = useState(-1); // State to track which suggestion is currently focused by the user initially none
@@ -98,11 +98,11 @@ export default function Places({ setUserLocation }) {
         }}
         disabled={!ready}
         onKeyDown={handleKeyDown}
-        className="w-full p-2 font-semibold text-gray-100 rounded  bg-gray-800 border border-gray-200"
+        className={customClass || "w-full p-2 font-semibold text-gray-100 rounded bg-gray-800 border border-gray-200"}
         placeholder="Enter your location"
       />
       {isDropdownVisible && status === "OK" && (
-        <ul className="absolute z-50 w-full bg-gray-800 scroll-smooth rounded shadow-lg font-poppins max-h-60  overflow-y-auto">
+        <ul className="absolute z-[9999] w-full bg-gray-800 scroll-smooth rounded shadow-lg font-poppins max-h-60 overflow-y-auto border border-gray-600">
           {data.map(({ place_id, description }, index) => (
             <li
               key={place_id}

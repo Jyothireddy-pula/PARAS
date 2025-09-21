@@ -384,7 +384,7 @@ const MobileMap = () => {
             }}
           >
             <motion.div 
-              className="p-0 w-[280px] max-w-[85vw]"
+              className="p-0 w-[280px] max-w-[85vw] overflow-hidden"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
@@ -396,7 +396,7 @@ const MobileMap = () => {
                   alt={selectedPark.name || selectedPark.address}
                   className="w-full h-32 object-cover rounded-t-lg"
                 />
-                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-900 px-2 py-1 rounded-full text-xs font-semibold shadow-lg max-w-[80px] truncate">
                   ₹{selectedPark.price_per_hour}/hr
                 </div>
                 <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
@@ -405,9 +405,9 @@ const MobileMap = () => {
               </div>
               
               {/* Content */}
-              <div className="p-3 space-y-2">
-                <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-1 truncate">
+              <div className="p-3 space-y-2 overflow-hidden">
+                <div className="overflow-hidden">
+                  <h3 className="font-bold text-gray-900 text-sm mb-1 truncate">
                     {selectedPark.name || selectedPark.address}
                   </h3>
                   <p className="text-xs text-gray-600 truncate">
@@ -417,44 +417,44 @@ const MobileMap = () => {
                 
                 {/* Compact info layout */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center justify-between min-w-0">
+                    <div className="flex items-center space-x-1 min-w-0 flex-1">
+                      <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-2.5 h-2.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                       </div>
-                      <span className="text-xs text-gray-500">Basements:</span>
+                      <span className="text-xs text-gray-500 truncate">Basements:</span>
                     </div>
-                    <span className="text-sm font-semibold text-blue-600">{selectedPark.basement_total}</span>
+                    <span className="text-xs font-semibold text-blue-600 flex-shrink-0 ml-1">{selectedPark.basement_total || 1}</span>
                   </div>
                   
                   {distance && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center justify-between min-w-0">
+                      <div className="flex items-center space-x-1 min-w-0 flex-1">
+                        <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <svg className="w-2.5 h-2.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                         </div>
-                        <span className="text-xs text-gray-500">Distance:</span>
+                        <span className="text-xs text-gray-500 truncate">Distance:</span>
                       </div>
-                      <span className="text-sm font-semibold text-green-600">{distance.text}</span>
+                      <span className="text-xs font-semibold text-green-600 flex-shrink-0 ml-1 truncate max-w-[80px]">{distance.text}</span>
                     </div>
                   )}
                   
                   {duration && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center justify-between min-w-0">
+                      <div className="flex items-center space-x-1 min-w-0 flex-1">
+                        <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <svg className="w-2.5 h-2.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <span className="text-xs text-gray-500">Duration:</span>
+                        <span className="text-xs text-gray-500 truncate">Duration:</span>
                       </div>
-                      <span className="text-sm font-semibold text-purple-600">{duration}</span>
+                      <span className="text-xs font-semibold text-purple-600 flex-shrink-0 ml-1">{duration}</span>
                     </div>
                   )}
                 </div>
@@ -463,7 +463,7 @@ const MobileMap = () => {
                 <div className="flex space-x-2 pt-1">
                   <motion.button
                     onClick={() => setShowInfoWindow(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors duration-200"
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-2 rounded-lg font-medium text-xs hover:bg-gray-200 transition-colors duration-200 min-w-0"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -471,7 +471,7 @@ const MobileMap = () => {
                   </motion.button>
                   <motion.button
                     onClick={handleBookNow}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-3 rounded-lg font-semibold text-sm shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-2 rounded-lg font-semibold text-xs shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 min-w-0"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

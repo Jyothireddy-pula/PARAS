@@ -1,7 +1,27 @@
-import React from 'react'
+import { useState } from 'react'
 import styles from '../../style'
+import SimpleLoader from './SimpleLoader'
+import ErrorBoundary from './ErrorBoundary'
+import PropTypes from 'prop-types'
 
-const Loader = () => {
+const Loader = ({ show3D = false, onComplete }) => {
+  const [show3DLoader, setShow3DLoader] = useState(show3D)
+
+  const handleLoaderComplete = () => {
+    setShow3DLoader(false)
+    if (onComplete) {
+      onComplete()
+    }
+  }
+
+  if (show3DLoader) {
+    return (
+      <ErrorBoundary onComplete={handleLoaderComplete}>
+        <SimpleLoader onComplete={handleLoaderComplete} />
+      </ErrorBoundary>
+    )
+  }
+
   return (
     <div className={`h-screen ${styles.flexCenter} `}>
     <svg
@@ -22,6 +42,11 @@ const Loader = () => {
     </svg>
   </div>
   )
+}
+
+Loader.propTypes = {
+  show3D: PropTypes.bool,
+  onComplete: PropTypes.func
 }
 
 export default Loader

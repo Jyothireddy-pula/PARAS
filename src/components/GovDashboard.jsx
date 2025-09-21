@@ -4,6 +4,7 @@ import BookingsDashboard from './BookingsDashboard';
 import MarkdownIt from 'markdown-it';
 import html2pdf from 'html2pdf.js';
 import { generateCongestionReport } from '../services/gemini';
+import Loader from './loading/Loader';
 
 import {
   BarChart,
@@ -372,7 +373,7 @@ const GovDashboard = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) return <Loader show3D={true} />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (

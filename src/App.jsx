@@ -23,6 +23,7 @@ const Register = lazy(() => import("./pages/Register"));
 const UploadParking = lazy(() => import("./pages/UploadParking"));
 const CommercialParkingForm = lazy(() => import("./pages/CommercialParkingForm"));
 const IndividualParkingForm = lazy(() => import("./pages/IndividualParkingForm"));
+const LoaderDemo = lazy(() => import("./components/loading/LoaderDemo"));
 
 const router = createBrowserRouter([
   {
@@ -115,6 +116,10 @@ const router = createBrowserRouter([
       {
         path: "gov",
         element: <GovDashboard />,
+      },
+      {
+        path: "loader-demo",
+        element: <LoaderDemo />,
       },
     ],
   },

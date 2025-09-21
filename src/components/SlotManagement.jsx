@@ -70,81 +70,151 @@ const SlotManagement = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-white text-center">Loading...</div>;
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600 text-lg">Loading parking slots...</p>
+        <p className="text-gray-400 text-sm mt-2">Please wait while we fetch your data</p>
+      </div>
+    );
   }
 
   if (!parkingData || Object.keys(parkingData).length === 0) {
-    return <div className="text-white text-center">No parking slots found</div>;
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-500 text-lg mb-2">No parking slots found</div>
+        <div className="text-gray-400 text-sm">Add some parking slots to get started</div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       {Object.entries(parkingData).map(([parkId, parkInfo]) => (
-        <div key={parkId} className="bg-[#2C3E50] rounded-lg p-6">
-          <h2 className="text-white text-2xl font-bold mb-6 border-b border-gray-700 pb-3">
-            {parkInfo.name}
-          </h2>
+        <div key={parkId} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-white text-2xl font-bold mb-2">
+                  {parkInfo.name}
+                </h2>
+                <p className="text-blue-100 text-sm">
+                  {Object.keys(parkInfo.basements).length} Basement{Object.keys(parkInfo.basements).length !== 1 ? 's' : ''} • {
+                    Object.values(parkInfo.basements).flat().length
+                  } Total Slots
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-white text-3xl font-bold">
+                  {Object.values(parkInfo.basements)
+                    .flat()
+                    .filter(slot => slot.status !== 'Occupied').length}
+                </div>
+                <div className="text-blue-100 text-sm">Available</div>
+              </div>
+            </div>
+          </div>
           
-          <div className="space-y-6">
-            {Object.entries(parkInfo.basements).map(([basement, slots]) => (
-              <div key={`${parkId}-${basement}`} className="bg-[#34495E] rounded-lg p-4">
-                <h3 className="text-white text-lg font-semibold mb-4">
-                  Basement {basement}
-                </h3>
-                
-                <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-                  {slots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      className={`
-                        aspect-square rounded-lg p-2
-                        flex items-center justify-center
-                        text-white font-medium
-                        transition-colors duration-200
-                        ${slot.status === 'Occupied'
-                          ? 'bg-red-500 hover:bg-red-600'
-                          : 'bg-green-500 hover:bg-green-600'
-                        }
-                      `}
-                    >
-                      {slot.slot_number}
+          {/* Content */}
+          <div className="p-6">
+            <div className="space-y-6">
+              {Object.entries(parkInfo.basements).map(([basement, slots]) => (
+                <div key={`${parkId}-${basement}`} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-gray-900 text-lg font-semibold">
+                      Basement {basement}
+                    </h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        {slots.filter(slot => slot.status !== 'Occupied').length} Available
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        {slots.filter(slot => slot.status === 'Occupied').length} Occupied
+                      </span>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+                    {slots.map((slot) => (
+                      <div
+                        key={slot.id}
+                        className={`
+                          aspect-square rounded-lg p-2
+                          flex items-center justify-center
+                          text-white font-semibold text-sm
+                          transition-all duration-200
+                          shadow-sm hover:shadow-md
+                          ${slot.status === 'Occupied'
+                            ? 'bg-red-500 hover:bg-red-600 cursor-not-allowed'
+                            : 'bg-green-500 hover:bg-green-600 cursor-pointer'
+                          }
+                        `}
+                        title={`Slot ${slot.slot_number} - ${slot.status}`}
+                      >
+                        {slot.slot_number}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Summary Stats */}
+            <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {Object.values(parkInfo.basements).flat().length}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Slots</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {Object.values(parkInfo.basements)
+                      .flat()
+                      .filter(slot => slot.status !== 'Occupied').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Available</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-red-600">
+                    {Object.values(parkInfo.basements)
+                      .flat()
+                      .filter(slot => slot.status === 'Occupied').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Occupied</div>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex items-center gap-4 text-sm text-gray-300">
-            <div className="flex items-center gap-2">
-              <span>Total Slots: {
-                Object.values(parkInfo.basements).flat().length
-              }</span>
-              <span>|</span>
-              <span>Available: {
-                Object.values(parkInfo.basements)
-                  .flat()
-                  .filter(slot => slot.status !== 'Occupied').length
-              }</span>
-              <span>|</span>
-              <span>Occupied: {
-                Object.values(parkInfo.basements)
-                  .flat()
-                  .filter(slot => slot.status === 'Occupied').length
-              }</span>
             </div>
           </div>
         </div>
       ))}
 
-      <div className="flex gap-4 mt-4">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-500 rounded"></div>
-          <span className="text-white text-sm">Available</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-red-500 rounded"></div>
-          <span className="text-white text-sm">Occupied</span>
+      {/* Legend */}
+      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
+        <div className="flex flex-wrap gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-white text-xs font-bold">A</span>
+            </div>
+            <div>
+              <div className="text-gray-900 font-medium">Available</div>
+              <div className="text-gray-500 text-sm">Slot is free and ready for booking</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-red-500 rounded-lg flex items-center justify-center">
+              <span className="text-white text-xs font-bold">O</span>
+            </div>
+            <div>
+              <div className="text-gray-900 font-medium">Occupied</div>
+              <div className="text-gray-500 text-sm">Slot is currently in use</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

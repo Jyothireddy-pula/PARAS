@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from '../lib/supabase';
 import { Loader } from "../components";
-import { FaClock, FaCar, FaMapMarkerAlt, FaRegCalendarAlt } from 'react-icons/fa';
+import { FaClock, FaCar, FaMapMarkerAlt, FaRegCalendarAlt, FaGift, FaCoins, FaTicketAlt, FaPercent } from 'react-icons/fa';
+import { motion, AnimatePresence } from "framer-motion";
+import FloatingElements from "../components/ui/FloatingElements";
+import AnimatedCard from "../components/ui/AnimatedCard";
+import AnimatedHeader from "../components/ui/AnimatedHeader";
+import ShimmerButton from "../components/ui/ShimmerButton";
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -109,123 +114,306 @@ const MyBookings = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
+        <FloatingElements />
+        <motion.div 
+          className="text-center z-10"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <FaCar className="text-white text-2xl" />
+          </div>
+          <span className="text-xl font-semibold text-gray-700">
+            Loading your bookings...
+          </span>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#2C3E50]">
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold text-white mb-8 text-center">My Bookings</h2>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      <FloatingElements />
+      
+      <div className="container mx-auto px-4 py-8 pt-24 md:pt-8 relative z-10">
+        {/* Page Header */}
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <FaCar className="text-white text-3xl" />
           </div>
-        )}
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">My Bookings</h1>
+          <p className="text-gray-600 text-lg">Manage your parking reservations and rewards</p>
+        </motion.div>
 
-        {bookings.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-300 text-lg">No bookings found</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {bookings.map((booking) => (
-              <div 
-                key={booking.id} 
-                className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-200 border-opacity-20 hover:transform hover:scale-105 transition-all duration-300"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-white">
-                    {booking.parking_slots?.it_parks?.name}
-                  </h3>
-                  <span className={`px-4 py-1 rounded-full text-sm font-medium ${
-                    booking.booking_status === 'active' 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-gray-500 text-white'
-                  }`}>
-                    {booking.booking_status}
-                  </span>
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-8 shadow-lg"
+            >
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
                 </div>
+                <span className="font-medium">{error}</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                <div className="space-y-4 text-gray-300">
-                  <div className="flex items-center gap-3">
-                    <FaMapMarkerAlt className="text-blue-400" />
-                    <span>{booking.parking_slots?.it_parks?.address}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <FaCar className="text-green-400" />
-                    <div>
-                      <p className="text-sm text-gray-400">Vehicle & Slot</p>
-                      <p>{booking.vehicle_number} | {booking.parking_slots?.basement_number}-{booking.parking_slots?.slot_number}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <FaClock className="text-yellow-400" />
-                    <div>
-                      <p className="text-sm text-gray-400">Duration</p>
-                      <p>{calculateDuration(booking.start_time, booking.end_time)} hours</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <FaRegCalendarAlt className="text-purple-400" />
-                    <div>
-                      <p className="text-sm text-gray-400">Timing</p>
-                      <p>{new Date(booking.start_time).toLocaleString()} - </p>
-                      <p>{new Date(booking.end_time).toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-600">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Total Amount</span>
-                      <span className="text-2xl font-bold text-white">
-                        ₹{calculatePrice(
-                          booking.start_time, 
-                          booking.end_time, 
-                          booking.parking_slots?.it_parks?.price_per_hour
-                        )}
+        {/* Bookings Section */}
+        {bookings.length === 0 ? (
+          <motion.div 
+            className="text-center py-16"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FaCar className="text-gray-400 text-3xl" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Bookings Found</h3>
+            <p className="text-gray-500 text-lg">You haven't made any parking reservations yet</p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {bookings.map((booking, index) => (
+              <motion.div
+                key={booking.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+              >
+                <AnimatedCard className="h-full">
+                  <div className="p-6">
+                    {/* Booking Header */}
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {booking.parking_slots?.it_parks?.name}
+                      </h3>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        booking.booking_status === 'active' 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {booking.booking_status}
                       </span>
                     </div>
+
+                    {/* Booking Details */}
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <FaMapMarkerAlt className="text-blue-600 text-sm" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Location</p>
+                          <p className="text-gray-900 font-medium">{booking.parking_slots?.it_parks?.address}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <FaCar className="text-green-600 text-sm" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Vehicle & Slot</p>
+                          <p className="text-gray-900 font-medium">
+                            {booking.vehicle_number} | B{booking.parking_slots?.basement_number}-{booking.parking_slots?.slot_number}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <FaClock className="text-yellow-600 text-sm" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Duration</p>
+                          <p className="text-gray-900 font-medium">{calculateDuration(booking.start_time, booking.end_time)} hours</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <FaRegCalendarAlt className="text-purple-600 text-sm" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Timing</p>
+                          <p className="text-gray-900 font-medium text-sm">
+                            {new Date(booking.start_time).toLocaleString()}
+                          </p>
+                          <p className="text-gray-900 font-medium text-sm">
+                            {new Date(booking.end_time).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Price Section */}
+                      <div className="mt-6 pt-4 border-t border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600 font-medium">Total Amount</span>
+                          <span className="text-2xl font-bold text-green-600">
+                            ₹{calculatePrice(
+                              booking.start_time, 
+                              booking.end_time, 
+                              booking.parking_slots?.it_parks?.price_per_hour
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AnimatedCard>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Rewards Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-12"
+        >
+          <AnimatedCard>
+            <div className="p-8">
+              {/* Rewards Header */}
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                  <FaGift className="text-white text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Reward Points</h3>
+                  <p className="text-gray-600">Earn points with every booking and redeem rewards</p>
+                </div>
+              </div>
+
+              {/* Points Display */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <FaCoins className="text-yellow-500 text-2xl" />
+                    <div>
+                      <p className="text-gray-600 text-sm">Total Points</p>
+                      <p className="text-3xl font-bold text-gray-900">{rewardPoints}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-600 text-sm">Earned from</p>
+                    <p className="text-lg font-semibold text-gray-900">{bookings.length} bookings</p>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
 
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-xl p-6 mt-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Reward Points</h3>
-          <p className="text-gray-300 mb-4">Total Reward Points: <span className="font-bold">{rewardPoints}</span></p>
+              {/* Reward Options */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <motion.button
+                  onClick={() => handleRedeemPoints(5000, '1 free booking')}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 transition-all duration-300 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={rewardPoints < 5000}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-3 mb-3">
+                    <FaTicketAlt className="text-2xl" />
+                    <div>
+                      <h4 className="font-bold text-lg">Free Booking</h4>
+                      <p className="text-blue-100 text-sm">5000 points</p>
+                    </div>
+                  </div>
+                  <p className="text-blue-100 text-sm">Get one completely free parking session</p>
+                </motion.button>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <button
-              onClick={() => handleRedeemPoints(5000, '1 free booking')}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105"
-              disabled={rewardPoints < 5000}
-            >
-              Redeem 5000 points - 1 Free Booking
-            </button>
-            <button
-              onClick={() => handleRedeemPoints(3000, '50% off')}
-              className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105"
-              disabled={rewardPoints < 3000}
-            >
-              Redeem 3000 points - 50% Off on Next Booking
-            </button>
-            <button
-              onClick={() => handleRedeemPoints(2000, '20% off')}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-transform transform hover:scale-105"
-              disabled={rewardPoints < 2000}
-            >
-              Redeem 2000 points - 20% Off on Next Booking
-            </button>
-          </div>
+                <motion.button
+                  onClick={() => handleRedeemPoints(3000, '50% off')}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white p-6 transition-all duration-300 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={rewardPoints < 3000}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-3 mb-3">
+                    <FaPercent className="text-2xl" />
+                    <div>
+                      <h4 className="font-bold text-lg">50% Off</h4>
+                      <p className="text-green-100 text-sm">3000 points</p>
+                    </div>
+                  </div>
+                  <p className="text-green-100 text-sm">Get 50% discount on your next booking</p>
+                </motion.button>
 
-          {conversionError && <p className="text-red-500 mt-2">{conversionError}</p>}
-          {conversionMessage && <p className="text-green-500 mt-2">{conversionMessage}</p>}
-        </div>
+                <motion.button
+                  onClick={() => handleRedeemPoints(2000, '20% off')}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 transition-all duration-300 hover:from-yellow-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={rewardPoints < 2000}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-3 mb-3">
+                    <FaPercent className="text-2xl" />
+                    <div>
+                      <h4 className="font-bold text-lg">20% Off</h4>
+                      <p className="text-yellow-100 text-sm">2000 points</p>
+                    </div>
+                  </div>
+                  <p className="text-yellow-100 text-sm">Get 20% discount on your next booking</p>
+                </motion.button>
+              </div>
+
+              {/* Messages */}
+              <AnimatePresence>
+                {conversionError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2"
+                  >
+                    <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">!</span>
+                    </div>
+                    <span className="font-medium">{conversionError}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {conversionMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center space-x-2"
+                  >
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <span className="font-medium">{conversionMessage}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </AnimatedCard>
+        </motion.div>
       </div>
     </div>
   );

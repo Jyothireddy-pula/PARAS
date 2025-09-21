@@ -7,7 +7,7 @@ const HomeLayout = () => {
   // Check if on /listbookings/:id or /listbookings/:id/confirm then no headers
   const routeCheck = 
     location.pathname.match(/^\/listbookings\/[^/]+(\/confirm)?$/);
-    
+  
   return (
     <div className="bg-[#F5F5F5] w-full min-h-screen">
       {!routeCheck && (

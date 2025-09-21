@@ -3,7 +3,6 @@ import styles from "../../style";
 import { parking } from "../../assets";
 import { GetStarted } from "../index";
 import { motion } from "framer-motion";
-import AnimatedText from "../ui/AnimatedText";
 import FloatingElements from "../ui/FloatingElements";
 const Hero = () => {
   return (
@@ -27,17 +26,11 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <AnimatedText 
-              text="Future of" 
-              className="block"
-              delay={500}
-            />
+            <span className="block">Future of</span>
             <br className="sm:block hidden" />
-            <AnimatedText 
-              text="Parking" 
-              className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"
-              delay={1000}
-            />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              Parking
+            </span>
           </motion.h1>
           <motion.div 
             className="ss:flex hidden md:mr-4 mr-0"
@@ -57,11 +50,9 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <AnimatedText 
-            text="ParkEase" 
-            className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400"
-            delay={1200}
-          />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+            ParkEase
+          </span>
         </motion.h1>
         
         <motion.p 

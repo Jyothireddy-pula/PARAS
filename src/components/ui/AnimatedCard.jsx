@@ -6,7 +6,7 @@ const AnimatedCard = ({ children, className = "", delay = 0, ...props }) => {
 
   return (
     <motion.div
-      className={`relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-100 ${className}`}
+      className={`relative rounded-2xl bg-white shadow-lg border border-gray-100 ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       initial={{ opacity: 0, y: 20 }}

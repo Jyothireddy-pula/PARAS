@@ -1,10 +1,10 @@
 import { Map, Places, MobileMap } from "../components";
 import { useNavigate } from "react-router-dom";
-import { parking } from "../assets";
-import { useState } from "react";
-import ChatWidget from "../components/ChatWidget";
-import { motion } from "framer-motion";
-import AnimatedText from "../components/ui/AnimatedText";
+import { parking, logo } from "../assets";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import SimpleLoader from "../components/loading/SimpleLoader";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import GlareCard from "../components/ui/GlareCard";
 import FloatingElements from "../components/ui/FloatingElements";
 import ShimmerButton from "../components/ui/ShimmerButton";
@@ -15,6 +15,12 @@ const Landing = () => {
   const navigate = useNavigate();
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleLoaderComplete = () => {
+    setIsLoading(false);
+  };
+
 
   const handleLocationSelect = (location, city) => {
     setSelectedLocation(location);
@@ -34,20 +40,26 @@ const Landing = () => {
 
   return (
     <>
-      {/* Mobile View - Only Map */}
-      <div className="md:hidden h-[calc(100vh-64px)] relative bg-gradient-to-br from-slate-50 to-blue-50">
-        <FloatingElements />
+      <AnimatePresence>
+        {isLoading && <SimpleLoader onComplete={handleLoaderComplete} />}
+      </AnimatePresence>
+      
+      {!isLoading && (
+        <>
+          {/* Mobile View - Only Map */}
+          <div className="md:hidden h-screen relative bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
+            <FloatingElements />
         
-        <motion.div 
-          className="absolute inset-0"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <AnimatedMapContainer className="h-full w-full rounded-none overflow-hidden">
-            <MobileMap />
-          </AnimatedMapContainer>
-        </motion.div>
+            <motion.div 
+              className="absolute top-16 inset-x-0 bottom-0"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <AnimatedMapContainer className="h-full w-full rounded-none overflow-hidden">
+                <MobileMap />
+              </AnimatedMapContainer>
+            </motion.div>
 
         {/* Mobile Search Overlay - Floating at bottom */}
         <motion.div 
@@ -68,16 +80,20 @@ const Landing = () => {
               </h2>
             </div>
             <div className="space-y-3">
-              <Places 
-                setUserLocation={handleLocationSelect}
-                customClass="shadow-none rounded-xl text-base p-3 bg-gray-50 border border-gray-200 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <ShimmerButton 
-                onClick={handleSearch}
-                className="w-full text-base py-3 rounded-xl"
-              >
-                🔍 Search Parking
-              </ShimmerButton>
+              <div className="relative z-20">
+                <Places 
+                  setUserLocation={handleLocationSelect}
+                  customClass="shadow-none rounded-xl text-base p-3 bg-gray-50 border border-gray-200 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div className="relative z-10">
+                <ShimmerButton 
+                  onClick={handleSearch}
+                  className="w-full text-base py-3 rounded-xl"
+                >
+                  🔍 Search Parking
+                </ShimmerButton>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -106,24 +122,27 @@ const Landing = () => {
         <motion.div 
           className="w-1/3 p-8 
             bg-white/60 backdrop-blur-sm
-            flex flex-col justify-center"
+            flex flex-col justify-center
+            relative overflow-visible"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          {/* Desktop image */}
+          {/* Logo Section */}
           <motion.div 
             className="mb-8"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <AnimatedCard className="p-4">
-              <img 
-                src={parking} 
-                alt="Parking Illustration" 
-                className="w-full h-48 object-contain rounded-lg"
-              />
+            <AnimatedCard className="p-6 bg-gradient-to-r from-blue-600 to-purple-600">
+              <div className="flex items-center justify-center">
+                <img 
+                  src={logo} 
+                  alt="PARAS Logo" 
+                  className="w-24 h-24 object-contain"
+            />
+          </div>
             </AnimatedCard>
           </motion.div>
 
@@ -137,16 +156,10 @@ const Landing = () => {
             <h1 className="text-3xl font-bold 
               text-gray-900
               tracking-tight leading-tight mb-2">
-              <AnimatedText 
-                text="Where to Go?" 
-                className="block"
-                delay={1000}
-              />
-              <AnimatedText 
-                text="Find A Parking Spot!!" 
-                className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
-                delay={1500}
-              />
+              <span className="block">Where to Go?</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                Find A Parking Spot!!
+              </span>
             </h1>
             <motion.p 
               className="text-base text-gray-600 font-normal
@@ -165,9 +178,9 @@ const Landing = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.2 }}
           >
-            <AnimatedCard className="p-0" delay={1.4}>
-              <Places 
-                setUserLocation={handleLocationSelect}
+            <AnimatedCard className="p-0 overflow-visible relative z-20" delay={1.4}>
+            <Places 
+              setUserLocation={handleLocationSelect}
                 customClass="shadow-none rounded-lg text-lg p-3 bg-transparent border-none w-full"
               />
             </AnimatedCard>
@@ -176,19 +189,20 @@ const Landing = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 1.6 }}
+              className="relative z-10"
             >
               <ShimmerButton 
-                onClick={handleSearch}
-                className="w-full text-lg py-3"
-              >
-                Find Parking
+              onClick={handleSearch}
+                className="w-full text-lg py-3 relative z-10"
+            >
+              Find Parking
               </ShimmerButton>
             </motion.div>
           </motion.div>
         </motion.div>
       </div>
-      
-      <ChatWidget />
+        </>
+      )}
     </>
   );
 };

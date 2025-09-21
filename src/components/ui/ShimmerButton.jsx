@@ -14,7 +14,7 @@ const ShimmerButton = ({ children, className = "", onClick, ...props }) => {
 
   return (
     <motion.button
-      className={`relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-4 transition-all duration-300 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-4 transition-all duration-300 flex items-center justify-center gap-3 ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -36,7 +36,9 @@ const ShimmerButton = ({ children, className = "", onClick, ...props }) => {
       />
       
       {/* Content */}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 flex items-center justify-center gap-3">
+        {children}
+      </span>
     </motion.button>
   );
 };

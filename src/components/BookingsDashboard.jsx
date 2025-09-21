@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import Loader from './loading/Loader';
 
 const BookingsDashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -112,7 +113,7 @@ const BookingsDashboard = () => {
     return sortedData;
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader show3D={true} />;
   if (error) return <div>Error: {error}</div>;
 
   return (

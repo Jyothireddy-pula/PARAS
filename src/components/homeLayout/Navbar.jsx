@@ -7,6 +7,7 @@ import { logout } from "../../features/authentication/authUserSlice";
 import { FaSignOutAlt } from "react-icons/fa";
 import { signOut } from "../../services/supabase";
 import { motion, AnimatePresence } from "framer-motion";
+import MobileNavbar from "./MobileNavbar";
 
 const Navbar = () => {
   const [toggle, setToggle] = useState(false);
@@ -32,12 +33,17 @@ const Navbar = () => {
   };
 
   return (
-    <motion.nav 
-      className="w-full flex py-4 justify-between items-center shadow-lg bg-gradient-to-r from-slate-800 to-slate-900 backdrop-blur-sm"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
+    <>
+      {/* Mobile Navbar */}
+      <MobileNavbar />
+      
+      {/* Desktop Navbar */}
+      <motion.nav 
+        className="w-full hidden md:flex py-4 justify-between items-center shadow-lg bg-gradient-to-r from-slate-800 to-slate-900 backdrop-blur-sm"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -224,6 +230,7 @@ const Navbar = () => {
         </AnimatePresence>
       </div>
     </motion.nav>
+    </>
   );
 };
 

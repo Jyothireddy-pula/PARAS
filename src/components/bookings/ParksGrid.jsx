@@ -8,7 +8,6 @@ import {
 import { ParkCard } from "../index";
 import styles from "../../style";
 import { motion } from "framer-motion";
-import AnimatedHeader from "../ui/AnimatedHeader";
 
 const ParksGrid = ({ userCity }) => {
   const dispatch = useDispatch();
@@ -119,15 +118,7 @@ const ParksGrid = ({ userCity }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header Section */}
-      <div className="pt-12 pb-8 px-6">
-        <AnimatedHeader
-          title="Available Parking Spots"
-          subtitle={`Find the perfect parking spot in ${userCity}`}
-          className="mb-8"
-        />
-      </div>
+    <div className="w-full">
 
       {/* Parks Grid */}
       <motion.div 
