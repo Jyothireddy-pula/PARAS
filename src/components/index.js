@@ -14,6 +14,7 @@ export { default as Button } from "./button/Button";
 export {default as InputField} from "./inputs/InputField"
 export {default as SingleSlot} from "./singleBooking/SingleSlot"
 export {default as Map} from "./mapBookings/Map"
+export {default as MobileMap} from "./mapBookings/MobileMap"
 export {default as Places} from "./mapBookings/Places"
 export {default as BookingsMap} from "./myBookings/BookingsMap"
 export {default as ParkCard} from "./cardsContainerLayout/ParkCard"
