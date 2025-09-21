@@ -20,6 +20,8 @@ const Confirmation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   
   const user = useSelector((state) => state.auth.user) || null;
 
@@ -52,9 +54,10 @@ const Confirmation = () => {
   }, [user]); // Only run when user data changes
 
   useEffect(() => {
+    // Reduce loading time for better UX
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 800);
   }, []);
 
   const validateForm = () => {
@@ -71,6 +74,7 @@ const Confirmation = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       // Get the current authenticated user
       const { data: { user } } = await supabase.auth.getUser();
@@ -96,17 +100,16 @@ const Confirmation = () => {
       if (!bookingsDetails.date) {
         throw new Error('Booking date is required');
       }
-      const bookingDate = new Date(bookingsDetails.date);
-      if (isNaN(bookingDate.getTime())) {
-        throw new Error('Invalid date format');
-      }
-
-      // Create timestamp for start time (with minutes)
-      const [startHours, startMinutes] = startTime.split(':').map(Number);
-
-      // Create date object with the correct time
-      const startDateTime = new Date(bookingDate);
-      startDateTime.setHours(startHours, startMinutes, 0, 0);
+      
+      // For hardware-based bookings, always use the current time
+      // This ensures billing starts immediately and avoids time validation issues
+      const startDateTime = new Date();
+      
+      // Debug log to see what we're creating
+      console.log('Hardware-based booking time:', {
+        currentTime: startDateTime.toISOString(),
+        billingStartsNow: true
+      });
 
       // For hardware-based booking, end time will be determined by hardware
       // Set a placeholder end time (24 hours later) - will be updated by hardware
@@ -115,7 +118,7 @@ const Confirmation = () => {
 
       // Debug log
       console.log('Hardware-based booking components:', {
-        bookingDate: bookingDate.toISOString(),
+        currentTime: startDateTime.toISOString(),
         requestedTime: {
           start: startTime
         },
@@ -152,10 +155,18 @@ const Confirmation = () => {
 
       dispatch(addBooking(bookingForRedux));
       dispatch(clearBookings());
-      navigate("/mybookings");
+      
+      // Show success state
+      setIsSuccess(true);
+      
+      // Redirect after showing success
+      setTimeout(() => {
+        navigate("/mybookings");
+      }, 1500);
     } catch (error) {
       console.error('Error saving booking:', error);
       alert(`Failed to save booking: ${error.message}`);
+      setIsSubmitting(false);
     }
   };
 
@@ -180,14 +191,62 @@ const Confirmation = () => {
           className="text-center z-10"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4 }}
         >
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <FaCheckCircle className="text-white text-2xl" />
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
           <span className="text-xl font-semibold text-gray-700">
             Preparing your booking...
           </span>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center relative overflow-hidden">
+        <FloatingElements />
+        <motion.div 
+          className="text-center z-10"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div 
+            className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          >
+            <FaCheckCircle className="text-white text-3xl" />
+          </motion.div>
+          <motion.h1 
+            className="text-3xl font-bold text-gray-900 mb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            Booking Confirmed! 🎉
+          </motion.h1>
+          <motion.p 
+            className="text-gray-600 text-lg mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            Your parking slot has been reserved successfully
+          </motion.p>
+          <motion.div 
+            className="flex items-center justify-center space-x-2 text-gray-500"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            <span>Redirecting to your bookings...</span>
+          </motion.div>
         </motion.div>
       </div>
     );
@@ -385,19 +444,36 @@ const Confirmation = () => {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col space-y-3 pt-4">
-                      <ShimmerButton 
-                        onClick={handleSubmit} 
-                        className="w-full py-3 text-lg font-semibold"
-                      >
-                        <FaCheckCircle />
-                        Confirm Booking
-                      </ShimmerButton>
+                      {isSubmitting ? (
+                        <motion.button
+                          disabled
+                          className="w-full py-3 px-6 bg-green-500 text-white rounded-xl font-semibold flex items-center justify-center space-x-2"
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 1 }}
+                        >
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Processing Booking...</span>
+                        </motion.button>
+                      ) : (
+                        <ShimmerButton 
+                          onClick={handleSubmit} 
+                          className="w-full py-3 text-lg font-semibold"
+                        >
+                          <FaCheckCircle />
+                          Confirm Booking
+                        </ShimmerButton>
+                      )}
                       
                       <motion.button
                         onClick={handleCancel}
-                        className="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors duration-300"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        disabled={isSubmitting}
+                        className={`w-full py-3 px-6 rounded-xl font-semibold transition-colors duration-300 ${
+                          isSubmitting 
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                        whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                        whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                       >
                         Cancel
                       </motion.button>

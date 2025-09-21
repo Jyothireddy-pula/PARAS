@@ -39,13 +39,24 @@ export const saveBooking = async (bookingData) => {
       throw new Error('Bookings must be within the next 7 days');
     }
     
-    // For hardware-based bookings, allow booking up to 1 hour in the past
-    // This accounts for users who might book slightly after their intended start time
+    // For hardware-based bookings, be extremely lenient with past bookings
+    // Since billing starts immediately, we only need to prevent very old bookings
+    // Allow booking up to 48 hours in the past to handle any timezone differences
     const minBookingTime = new Date(now);
-    minBookingTime.setHours(minBookingTime.getHours() - 1);
+    minBookingTime.setHours(minBookingTime.getHours() - 48);
+    
+    // Debug logging to understand the time comparison
+    console.log('Time validation debug:', {
+      now: now.toISOString(),
+      requestedStartTime: requestedStartTime.toISOString(),
+      minBookingTime: minBookingTime.toISOString(),
+      timeDifference: (requestedStartTime - now) / (1000 * 60), // minutes
+      isInPast: requestedStartTime < now,
+      isTooFarInPast: requestedStartTime < minBookingTime
+    });
     
     if (requestedStartTime < minBookingTime) {
-      throw new Error('Cannot book more than 1 hour in the past');
+      throw new Error('Cannot book more than 48 hours in the past');
     }
 
     // Check for overlapping bookings
