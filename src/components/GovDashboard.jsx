@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchCongestionData } from '../services/supabase';
+// import { fetchCongestionData } from '../services/supabase';
+import { fetchCongestionFromML } from '../services/supabase';
+
 import BookingsDashboard from './BookingsDashboard';
 import MarkdownIt from 'markdown-it';
 import html2pdf from 'html2pdf.js';
@@ -40,7 +42,8 @@ const GovDashboard = () => {
   const loadCongestionData = async () => {
     try {
       setLoading(true);
-      const data = await fetchCongestionData();
+      // const data = await fetchCongestionData();
+      const data = await fetchCongestionFromML({ days: 30, lookback_days: 7 });
       setCongestionData(data);
     } catch (err) {
       setError(err.message);

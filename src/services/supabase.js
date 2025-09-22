@@ -199,3 +199,22 @@ const getDateRange = (timeFrame) => {
       return new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)).toISOString();
   }
 }; 
+
+export const fetchCongestionFromML = async (params = { days: 30, lookback_days: 7 }) => {
+  const base = import.meta.env.VITE_CONGESTION_ML_URL;
+  if (!base) {
+    throw new Error("VITE_CONGESTION_ML_URL is not defined in your environment variables.");
+  }
+  
+  const url = new URL('/api/congestion', base);
+  url.searchParams.set('days', params.days);
+  url.searchParams.set('lookback_days', params.lookback_days);
+
+  const res = await fetch(url.toString());
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw new Error(`ML API error: ${res.status} - ${errorBody.detail || 'Unknown error'}`);
+  }
+  return await res.json();
+};
