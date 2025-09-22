@@ -11,7 +11,6 @@ const BookingCancellationModal = ({ booking, isOpen, onClose, onCancel }) => {
   const [billingInfo, setBillingInfo] = useState(null);
   const [loadingCost, setLoadingCost] = useState(true);
 
-  // Fetch real-time billing information when modal opens
   useEffect(() => {
     if (isOpen && booking) {
       fetchCurrentBilling();
@@ -21,15 +20,13 @@ const BookingCancellationModal = ({ booking, isOpen, onClose, onCancel }) => {
   const fetchCurrentBilling = async () => {
     try {
       setLoadingCost(true);
-      
-      // Get current billing cost
+       
       const { data: costData, error: costError } = await supabase.rpc('get_active_booking_cost', {
         p_booking_id: booking.id
       });
 
       if (costError) throw costError;
-
-      // Get detailed billing breakdown
+ 
       const { data: billingData, error: billingError } = await supabase.rpc('calculate_booking_billing', {
         p_booking_id: booking.id,
         p_end_time: new Date().toISOString()
