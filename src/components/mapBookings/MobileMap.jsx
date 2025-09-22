@@ -39,6 +39,8 @@ const MobileMap = () => {
 
   const mapRef = useRef();
   const { itParks, cities, loading } = useSelector((state) => state.parking);
+  const hasAnnouncedNearestRef = useRef(false);
+  const hasGeoErrorRef = useRef(false);
 
   // Fetch parking data when component mounts
   useEffect(() => {
@@ -189,7 +191,7 @@ const MobileMap = () => {
             mapRef.current?.panTo(pos);
             
             // Find and show nearest parking automatically
-            if (parks.length > 0) {
+            if (parks.length > 0 && !hasAnnouncedNearestRef.current) {
               setIsFindingNearest(true);
               setTimeout(() => {
                 const nearestPark = findNearestPark(pos, parks);
@@ -197,7 +199,8 @@ const MobileMap = () => {
                   // Auto-select the nearest parking and show directions
                   handleParkClick(nearestPark);
                   // Show a toast notification
-                  toast.success(`Found nearest parking: ${nearestPark.name || nearestPark.address}`);
+                  toast.success(`Found nearest parking: ${nearestPark.name || nearestPark.address}`, { toastId: 'nearest-found' });
+                  hasAnnouncedNearestRef.current = true;
                 }
                 setIsFindingNearest(false);
               }, 1000); // Small delay to show loading state
@@ -205,11 +208,17 @@ const MobileMap = () => {
           },
           (error) => {
             console.error("Error getting current location:", error);
-            toast.error("Unable to get your location");
+            if (!hasGeoErrorRef.current) {
+              toast.error("Unable to get your location", { toastId: 'geo-error' });
+              hasGeoErrorRef.current = true;
+            }
           }
         );
       } else {
-        toast.error("Geolocation is not supported by your browser");
+        if (!hasGeoErrorRef.current) {
+          toast.error("Geolocation is not supported by your browser", { toastId: 'geo-error' });
+          hasGeoErrorRef.current = true;
+        }
       }
     };
 

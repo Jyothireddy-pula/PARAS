@@ -40,6 +40,7 @@ const Map = () => {
 
   const mapRef = useRef();
   const { itParks, cities, loading } = useSelector((state) => state.parking);
+  const hasGeoErrorRef = useRef(false);
 
   // Add this useEffect to fetch parking data when component mounts
   useEffect(() => {
@@ -194,10 +195,17 @@ const Map = () => {
         },
         (error) => {
           console.error("Error getting current location:", error);
+          if (!hasGeoErrorRef.current) {
+            toast.error("Unable to get your location", { toastId: 'geo-error' });
+            hasGeoErrorRef.current = true;
+          }
         }
       );
     } else {
-      console.error("Geolocation is not supported by this browser.");
+      if (!hasGeoErrorRef.current) {
+        toast.error("Geolocation is not supported by your browser", { toastId: 'geo-error' });
+        hasGeoErrorRef.current = true;
+      }
     }
   };
 
@@ -220,13 +228,19 @@ const Map = () => {
               fetchDirections(nearestPark);
             }
           },
-          (error) => {
-            console.error("Error getting current location:", error);
-            toast.error("Unable to get your location");
+        (error) => {
+          console.error("Error getting current location:", error);
+          if (!hasGeoErrorRef.current) {
+            toast.error("Unable to get your location", { toastId: 'geo-error' });
+            hasGeoErrorRef.current = true;
           }
+        }
         );
       } else {
-        toast.error("Geolocation is not supported by your browser");
+      if (!hasGeoErrorRef.current) {
+        toast.error("Geolocation is not supported by your browser", { toastId: 'geo-error' });
+        hasGeoErrorRef.current = true;
+      }
       }
     };
 

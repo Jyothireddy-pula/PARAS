@@ -24,8 +24,7 @@ const Confirmation = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   
   const user = useSelector((state) => state.auth.user) || null;
-
-  // Initialize form data
+ 
   const [formData, setFormData] = useState({
     vehicleNumber: user?.vehicleNumber || "",
     email: user?.email || "",
@@ -41,8 +40,7 @@ const Confirmation = () => {
     bookingsDetails,
     selectedSlot,
   } = useSelector((state) => state.bookings);
-
-  // Auto-fill only if formData is empty
+ 
   useEffect(() => {
     if (user && !formData.vehicleNumber) {
       setFormData(prev => ({
@@ -51,10 +49,9 @@ const Confirmation = () => {
         vehicleNumber: user.vehicleNumber || "",
       }));
     }
-  }, [user]); // Only run when user data changes
+  }, [user]); 
 
-  useEffect(() => {
-    // Reduce loading time for better UX
+  useEffect(() => { 
     setTimeout(() => {
       setIsLoading(false);
     }, 800);
@@ -75,48 +72,43 @@ const Confirmation = () => {
     }
 
     setIsSubmitting(true);
-    try {
-      // Get the current authenticated user
+    try { 
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('No authenticated user found');
       }
-
-      // For hardware-based booking, we only need start time
+ 
       if (!bookingsDetails.startTime) {
         throw new Error('Start time is required');
       }
 
       const startTime = bookingsDetails.startTime;
-      
-      // Validate time format (24-hour format with minutes)
+       
       const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
       if (!timeRegex.test(startTime)) {
         throw new Error('Invalid time format. Please use HH:MM format (24-hour)');
       }
 
-      // Create a Date object for the booking date
+      
       if (!bookingsDetails.date) {
         throw new Error('Booking date is required');
       }
       
-      // For hardware-based bookings, always use the current time
-      // This ensures billing starts immediately and avoids time validation issues
+      
       const startDateTime = new Date();
       
-      // Debug log to see what we're creating
+      
       console.log('Hardware-based booking time:', {
         currentTime: startDateTime.toISOString(),
         billingStartsNow: true
       });
 
-      // For hardware-based booking, end time will be determined by hardware
-      // Set a placeholder end time (24 hours later) - will be updated by hardware
+      
       const endDateTime = new Date(startDateTime);
       endDateTime.setHours(startDateTime.getHours() + 24);
 
-      // Debug log
+      
       console.log('Hardware-based booking components:', {
         currentTime: startDateTime.toISOString(),
         requestedTime: {
@@ -132,16 +124,16 @@ const Confirmation = () => {
       const bookingData = {
         slot_id: selectedSlot.id,
         start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(), // Placeholder - will be updated by hardware
+        end_time: endDateTime.toISOString(),  
         vehicle_number: formData.vehicleNumber,
         booking_type: 'hardware_based',
         hardware_entry_detected: false,
         hardware_exit_detected: false,
-        billing_started: true, // Start billing immediately
-        billing_start_time: new Date().toISOString(), // Current time when booking is made
+        billing_started: true, 
+        billing_start_time: new Date().toISOString(), 
       };
 
-      // Debug log to verify the data
+       
       console.log('Booking Data to be saved:', bookingData);
 
       const savedBooking = await saveBooking(bookingData);
@@ -156,10 +148,10 @@ const Confirmation = () => {
       dispatch(addBooking(bookingForRedux));
       dispatch(clearBookings());
       
-      // Show success state
+       
       setIsSuccess(true);
       
-      // Redirect after showing success
+      
       setTimeout(() => {
         navigate("/mybookings");
       }, 1500);
