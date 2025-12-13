@@ -1,8 +1,12 @@
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase';
+
+/* =========================
+   AUTH
+========================= */
 
 export const signUp = async ({ email, password, name, vehicleNumber }) => {
   try {
-    // First check if profile already exists
+    // Check if profile already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
@@ -13,26 +17,30 @@ export const signUp = async ({ email, password, name, vehicleNumber }) => {
       throw new Error('User with this email already exists');
     }
 
-    // Sign up the user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-  
+    // Sign up user
+    const { data: authData, error: authError } =
+      await supabase.auth.signUp({
+        email,
+        password,
+      });
+
     if (authError) throw authError;
 
-    // Create profile entry
+    // Create profile with default role
     const { error: profileError } = await supabase
       .from('profiles')
-      .upsert([  // Using upsert instead of insert
-        {
-          id: authData.user.id,
-          email,
-          full_name: name,
-          vehicle_number: vehicleNumber,
-        }
-      ], 
-      { onConflict: 'id' });  // Handle conflicts on id column
+      .upsert(
+        [
+          {
+            id: authData.user.id,
+            email,
+            full_name: name,
+            vehicle_number: vehicleNumber,
+            role: 'driver', // default role
+          },
+        ],
+        { onConflict: 'id' }
+      );
 
     if (profileError) throw profileError;
 
@@ -40,50 +48,51 @@ export const signUp = async ({ email, password, name, vehicleNumber }) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 export const signIn = async ({ email, password }) => {
-  const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
+  const {
+    data: { user, session },
+    error,
+  } = await supabase.auth.signInWithPassword({
     email,
-    password
-  })
-  
-  if (error) throw error
+    password,
+  });
 
-  // Get user profile
+  if (error) throw error;
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .single();
 
-  return { user, session, profile }
-}
+  return { user, session, profile };
+};
 
 export const guestSignIn = async () => {
-  const email = 'guest@example.com'
-  const password = 'guest123' // You should use a more secure password in production
-
-  return signIn({ email, password })
-}
+  return signIn({
+    email: 'guest@example.com',
+    password: 'guest123',
+  });
+};
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
-}
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+};
+
+/* =========================
+   BOOKINGS
+========================= */
 
 export const saveBooking = async (bookingData) => {
-  try {
-    const { data, error } = await supabase
-      .from('bookings')
-      .insert([bookingData]);
+  const { data, error } = await supabase
+    .from('bookings')
+    .insert([bookingData]);
 
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error saving booking:', error);
-    throw error;
-  }
+  if (error) throw error;
+  return data;
 };
 
 export const fetchCities = async () => {
@@ -97,21 +106,20 @@ export const fetchCities = async () => {
 };
 
 export const createParking = async (parkingData) => {
-  // Add the default image URL to the parking data
   const parkingWithImage = {
     ...parkingData,
-    image_url: "https://ipmshfkymnflueddojcw.supabase.co/storage/v1/object/public/parking-images/premium_photo-1661902046698-40bba703f396.jpg"
+    image_url:
+      'https://ipmshfkymnflueddojcw.supabase.co/storage/v1/object/public/parking-images/premium_photo-1661902046698-40bba703f396.jpg',
   };
 
-  // Create the IT park entry with the default image
-  const { data: parkData, error: parkError } = await supabase
+  const { data, error } = await supabase
     .from('it_parks')
     .insert([parkingWithImage])
     .select()
     .single();
 
-  if (parkError) throw parkError;
-  return parkData;
+  if (error) throw error;
+  return data;
 };
 
 export const createParkingSlots = async (slotsData) => {
@@ -128,7 +136,7 @@ export const fetchBookingStatistics = async (timeFrame) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error('User must be logged in to view statistics');
+  if (!user) throw new Error('User not logged in');
 
   const { data, error } = await supabase
     .from('bookings')
@@ -150,23 +158,7 @@ export const fetchBookingStatistics = async (timeFrame) => {
     .gte('created_at', getDateRange(timeFrame))
     .order('created_at', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching bookings:', error);
-    throw error;
-  }
-
-  console.log('Fetched bookings:', data);
-  return data;
-};
-
-export const fetchCongestionData = async () => {
-  const { data, error } = await supabase.rpc('get_congestion_data');
-  
-  if (error) {
-    console.error('Error fetching congestion data:', error);
-    throw error;
-  }
-  
+  if (error) throw error;
   return data;
 };
 
@@ -174,47 +166,70 @@ export const fetchBookingsByCity = async (city) => {
   const { data, error } = await supabase
     .from('bookings')
     .select('*')
-    .eq('city', city); // Adjust the query according to your database schema
+    .eq('city', city);
 
-  if (error) {
-    console.error('Error fetching bookings:', error);
-    return [];
-  }
+  if (error) return [];
   return data;
 };
 
-// Helper function to get date range based on timeframe
-const getDateRange = (timeFrame) => {
-  // Use UTC to avoid timezone issues
-  const now = new Date();
-  
-  switch (timeFrame) {
-    case 'day':
-      return new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)).toISOString(); // Last 7 days
-    case 'week':
-      return new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString(); // Last 30 days
-    case 'month':
-      return new Date(now.getTime() - (365 * 24 * 60 * 60 * 1000)).toISOString(); // Last 365 days
-    default:
-      return new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)).toISOString();
-  }
-}; 
+/* =========================
+   CONGESTION
+========================= */
 
-export const fetchCongestionFromML = async (params = { days: 30, lookback_days: 7 }) => {
+export const fetchCongestionData = async () => {
+  const { data, error } = await supabase.rpc('get_congestion_data');
+  if (error) throw error;
+  return data;
+};
+
+export const fetchCongestionFromML = async (
+  params = { days: 30, lookback_days: 7 }
+) => {
   const base = import.meta.env.VITE_CONGESTION_ML_URL;
   if (!base) {
-    throw new Error("VITE_CONGESTION_ML_URL is not defined in your environment variables.");
+    throw new Error('VITE_CONGESTION_ML_URL not set');
   }
-  
+
   const url = new URL('/api/congestion', base);
   url.searchParams.set('days', params.days);
   url.searchParams.set('lookback_days', params.lookback_days);
 
   const res = await fetch(url.toString());
+  if (!res.ok) throw new Error('ML API error');
 
-  if (!res.ok) {
-    const errorBody = await res.json();
-    throw new Error(`ML API error: ${res.status} - ${errorBody.detail || 'Unknown error'}`);
+  return res.json();
+};
+
+/* =========================
+   ROLE (RBAC)
+========================= */
+
+export const getUserRole = async (userId) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+
+  if (error || !data) return 'driver';
+  return data.role;
+};
+
+/* =========================
+   HELPERS
+========================= */
+
+const getDateRange = (timeFrame) => {
+  const now = new Date();
+
+  switch (timeFrame) {
+    case 'day':
+      return new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
+    case 'week':
+      return new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString();
+    case 'month':
+      return new Date(now - 365 * 24 * 60 * 60 * 1000).toISOString();
+    default:
+      return new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
   }
-  return await res.json();
 };
