@@ -1,0 +1,2 @@
+ALTER TABLE auth.users
+ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'driver';
