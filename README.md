@@ -4,6 +4,26 @@
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.11-purple)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.11-cyan)](https://tailwindcss.com/)
+---
+
+## 🔧 My Contributions (Fork Notes)
+
+This repository is a **fork of the original PARAS project**.  
+My work in this fork focuses on understanding, extending, and improving a **large-scale production-style codebase**.
+
+### Key Contributions
+- Improved and maintained project documentation for clarity and onboarding
+- Refactored selected components to improve readability and structure
+- Fixed minor issues and validated application workflows
+- Tested features across different UI flows and configurations
+
+🔗 **My commits:**  
+https://github.com/Jyothireddy-pula/PARAS/commits?author=Jyothireddy-pula
+
+> This fork demonstrates my ability to work with existing systems, collaborate via Git-based workflows, and contribute responsibly to large projects.
+
+---
+
 
 A modern, full-stack parking management solution with real-time availability tracking, AI-powered analytics, beautiful UI animations, and integrated mapping. Built with React, Vite, and enhanced with Aceternity UI components.
 
